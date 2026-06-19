@@ -168,65 +168,99 @@
     <div class="game-container">
         <h1>Bigger Coin</h1>
         
-        <!-- Balance UI -->
         <div class="balance-container">
             <div class="balance-label">Your Balance</div>
             <div class="balance-amount" id="balance">0</div>
         </div>
 
-        <!-- Interactive Coin Button -->
         <button class="coin-button" id="coinBtn">
             <div class="coin-image">🪙</div>
         </button>
 
-        <!-- Referral Section -->
         <div class="feature-box">
             <h3>Invite Friends</h3>
-            <p>Get +500 coins for every friend who joins via your link!</p>
+            <p>Get +500 coins instantly when a friend joins via your link!</p>
             <button class="share-btn" id="copyRefBtn">Copy Referral Link</button>
         </div>
 
-        <!-- Withdrawal Section -->
         <div class="feature-box">
             <h3>Withdrawal <span class="status-badge">Locked</span></h3>
-            <p>Coins cannot be withdrawn yet. Withdrawal functionality will automatically unlock as soon as Bigger Coin officially launches! Stay tuned.</p>
+            <p>Coins cannot be withdrawn yet. Withdrawal functionality will automatically unlock as soon as Bigger Coin officially launches!</p>
             <button class="withdraw-btn" disabled>🔒 Locked Until Launch</button>
         </div>
     </div>
 
     <div class="toast" id="toast">Link copied!</div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
-        let balance = parseInt(localStorage.getItem('coin_balance')) || 0;
-        const balanceDisplay = document.getElementById('balance');
-        const coinBtn = document.getElementById('coinBtn');
+        // Realtime Network Sync Configuration
+        const firebaseConfig = {
+            databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/"
+        };
+        
+        // Initialize network link
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
 
-        balanceDisplay.textContent = balance.toLocaleString();
-
-        coinBtn.addEventListener('click', () => {
-            balance += 1; 
-            balanceDisplay.textContent = balance.toLocaleString();
-            localStorage.setItem('coin_balance', balance);
-        });
-
+        // 1. Establish User Profile
         let userId = localStorage.getItem('game_user_id');
         if (!userId) {
             userId = 'user_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('game_user_id', userId);
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const referrer = urlParams.get('ref');
-        const hasClaimedRef = localStorage.getItem('claimed_referral');
+        let balance = 0;
+        const balanceDisplay = document.getElementById('balance');
+        const coinBtn = document.getElementById('coinBtn');
 
-        if (referrer && !hasClaimedRef) {
-            balance += 500; 
+        // 2. Real-time Database Listener
+        // Automatically syncs balance over the internet whenever changes occur
+        const userRef = database.ref('users/' + userId);
+        userRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                balance = data.balance || 0;
+            } else {
+                balance = parseInt(localStorage.getItem('coin_balance')) || 0;
+                userRef.set({ balance: balance });
+            }
+            balanceDisplay.textContent = balance.toLocaleString();
+        });
+
+        // Tap Mechanics
+        coinBtn.addEventListener('click', () => {
+            balance += 1;
             balanceDisplay.textContent = balance.toLocaleString();
             localStorage.setItem('coin_balance', balance);
+            userRef.update({ balance: balance });
+        });
+
+        // 3. Automated Network Referral Logic
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrerId = urlParams.get('ref');
+        const hasClaimedRef = localStorage.getItem('claimed_referral');
+
+        if (referrerId && referrerId !== userId && !hasClaimedRef) {
+            // Give incoming player 500 setup coins
+            balance += 500;
+            userRef.update({ balance: balance });
             localStorage.setItem('claimed_referral', 'true');
-            showToast("Welcome! Received 500 bonus coins!");
+
+            // Send 500 coins to the person who invited them across the database
+            const referrerRef = database.ref('users/' + referrerId + '/balance');
+            referrerRef.transaction((currentBalance) => {
+                return (currentBalance || 0) + 500;
+            });
+
+            showToast("Welcome! Received 500 referral bonus coins!");
         }
 
+        // Copy Referral Link Actions
         const copyRefBtn = document.getElementById('copyRefBtn');
         copyRefBtn.addEventListener('click', () => {
             const cleanUrl = window.location.href.split('?')[0];
