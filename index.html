@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -333,6 +334,7 @@
 </head>
 <body>
 
+    <!-- Redirect Launch Shield -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -342,6 +344,7 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
+    <!-- Active Interface Layout Structure -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
@@ -357,6 +360,7 @@
             </div>
         </div>
 
+        <!-- TAB 1: CLICKER GAME -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -372,6 +376,7 @@
             </div>
         </div>
 
+        <!-- TAB 2: REF LINK -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -382,6 +387,7 @@
             </button>
         </div>
 
+        <!-- TAB 3: TASKS SYSTEM -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container" style="width:100%;">
@@ -396,6 +402,7 @@
             </div>
         </div>
 
+        <!-- TAB 4: MARKETPLACE SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Purchased coins are safely deposited into your Store Balance after verification.</p>
@@ -421,6 +428,7 @@
             </div>
         </div>
 
+        <!-- TAB 5: SECRET ADMIN PANEL -->
         <div class="screen" id="screen-admin">
             <h2 style="margin-top:0; color: #ff4a4a; width:100%;">Admin Approval Desk</h2>
             <p style="font-size:12px; color:var(--text-secondary); margin-bottom:15px; width:100%;">Review ledger logs and approve store coin issuance below.</p>
@@ -429,6 +437,7 @@
             </div>
         </div>
 
+        <!-- System Footer Menu Options -->
         <nav class="nav-bar">
             <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
             <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
@@ -438,6 +447,7 @@
         </nav>
     </div>
 
+    <!-- MODAL POPUPS LAYERS -->
     <div class="modal" id="currencyModal">
         <div class="modal-content">
             <h3>Select Payment Option</h3>
@@ -459,11 +469,12 @@
 
     <div class="toast" id="toast">Copied!</div>
 
+    <!-- Firebase SDK Operations Modules -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ⚠️ EDIT THESE THREE LINES WITH YOUR RELEVANT DETAILS FROM BOTFATHER & USERINFOBOT
+        // ⚠️ REMEMBER TO PUT YOUR RUNNING BOT INFO HERE:
         const BOT_USERNAME = "YOUR_ACTUAL_BOT_USERNAME_HERE"; 
         const ADMIN_CHAT_ID = "YOUR_NUMERIC_TELEGRAM_ID_HERE"; 
         const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
@@ -480,9 +491,10 @@
         var username = "Player";
         var userTgHandle = "";
 
-        let liveTapBalance = 0;
-        let liveShopBalance = 0;
-        let multitapLvl = 1;
+        // Core balances fallback directly onto phone internal storage immediately
+        let liveTapBalance = parseInt(localStorage.getItem('bcoin_backup_tap')) || 0;
+        let liveShopBalance = parseInt(localStorage.getItem('bcoin_backup_shop')) || 0;
+        let multitapLvl = parseInt(localStorage.getItem('bcoin_backup_level')) || 1;
         let currentEnergy = 500;
         let maxEnergy = 500;
 
@@ -518,18 +530,35 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
-            // LIVE REALTIME LISTENER (Loads player balances safely whenever they reopen the app)
+            // Set visual balances to phone memory right away so they never see "0"
+            tapDisplay.textContent = liveTapBalance.toLocaleString();
+            shopDisplay.textContent = liveShopBalance.toLocaleString();
+            mLevelDisp.textContent = multitapLvl;
+            mCostDisp.textContent = multitapLvl * 100;
+
+            // Load Firebase securely, but prevent overriding if data is blank/bugged
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    liveTapBalance = data.tapBalance || 0;
-                    liveShopBalance = data.shopBalance || 0;
-                    multitapLvl = data.multitapLvl || 1;
+                    // Only accept database value if it is higher or equal to local memory
+                    if ((data.tapBalance || 0) >= liveTapBalance) {
+                        liveTapBalance = data.tapBalance || 0;
+                        localStorage.setItem('bcoin_backup_tap', liveTapBalance);
+                    }
+                    if ((data.shopBalance || 0) >= liveShopBalance) {
+                        liveShopBalance = data.shopBalance || 0;
+                        localStorage.setItem('bcoin_backup_shop', liveShopBalance);
+                    }
+                    if ((data.multitapLvl || 1) >= multitapLvl) {
+                        multitapLvl = data.multitapLvl || 1;
+                        localStorage.setItem('bcoin_backup_level', multitapLvl);
+                    }
                     
                     mLevelDisp.textContent = multitapLvl;
                     mCostDisp.textContent = multitapLvl * 100;
                 } else {
-                    userRef.set({ tapBalance: 0, shopBalance: 0, multitapLvl: 1, name: username, handle: userTgHandle });
+                    // Initialize if completely blank profile
+                    userRef.set({ tapBalance: liveTapBalance, shopBalance: liveShopBalance, multitapLvl: multitapLvl, name: username, handle: userTgHandle });
                 }
                 tapDisplay.textContent = liveTapBalance.toLocaleString();
                 shopDisplay.textContent = liveShopBalance.toLocaleString();
@@ -543,7 +572,7 @@
                 }
             }, 1500);
 
-            // AUTO-SAVE TAP PROCESS
+            // Double security tap engine (Saves to both Cloud Database AND Local Phone Cache)
             document.getElementById('coinBtn').addEventListener('click', () => {
                 if (currentEnergy >= multitapLvl) {
                     currentEnergy -= multitapLvl;
@@ -553,7 +582,8 @@
                     energyFill.style.width = (currentEnergy / maxEnergy) * 100 + "%";
                     tapDisplay.textContent = liveTapBalance.toLocaleString();
                     
-                    // Saves instantly to cloud nodes so nothing resets on app close
+                    // Permanent immediate backup triggers
+                    localStorage.setItem('bcoin_backup_tap', liveTapBalance);
                     userRef.update({ tapBalance: liveTapBalance });
                 }
             });
@@ -563,6 +593,8 @@
                 if (liveTapBalance >= cost) {
                     liveTapBalance -= cost;
                     multitapLvl += 1;
+                    localStorage.setItem('bcoin_backup_tap', liveTapBalance);
+                    localStorage.setItem('bcoin_backup_level', multitapLvl);
                     userRef.update({ tapBalance: liveTapBalance, multitapLvl: multitapLvl });
                 } else { alert("Not enough Tapped Coins!"); }
             });
@@ -570,6 +602,7 @@
             if (referrerId && referrerId !== userId && !localStorage.getItem('tg_bcoin_ref')) {
                 database.ref('tg_game_users/' + referrerId + '/tapBalance').transaction((curr) => (curr || 0) + 500);
                 liveTapBalance += 200;
+                localStorage.setItem('bcoin_backup_tap', liveTapBalance);
                 userRef.update({ tapBalance: liveTapBalance });
                 localStorage.setItem('tg_bcoin_ref', 'true');
             }
