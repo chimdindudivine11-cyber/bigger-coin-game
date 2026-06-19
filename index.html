@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             margin: 0;
@@ -16,7 +17,8 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
+            user-select: none;
         }
 
         .game-container {
@@ -25,10 +27,24 @@
             max-width: 400px;
             padding: 20px;
             box-sizing: border-box;
+            display: block;
+        }
+
+        /* Access Denied Shield for Regular Browsers */
+        #telegram-shield {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            max-width: 350px;
+        }
+
+        .shield-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             margin-bottom: 10px;
             color: #66fcf1;
             text-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
@@ -43,14 +59,14 @@
         }
 
         .balance-label {
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #c5c6c7;
         }
 
         .balance-amount {
-            font-size: 42px;
+            font-size: 46px;
             font-weight: bold;
             color: #66fcf1;
             margin-top: 5px;
@@ -61,27 +77,26 @@
             border: none;
             outline: none;
             cursor: pointer;
-            transition: transform 0.1s ease;
+            transition: transform 0.05s ease;
             margin-bottom: 30px;
             -webkit-tap-highlight-color: transparent;
         }
 
         .coin-button:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
 
         .coin-image {
-            width: 180px;
-            height: 180px;
+            width: 190px;
+            height: 190px;
             background: radial-gradient(circle, #f7b924 0%, #d4af37 60%, #aa7c11 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 70px;
-            box-shadow: 0 0 30px rgba(247, 185, 36, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.6);
+            font-size: 75px;
+            box-shadow: 0 0 35px rgba(247, 185, 36, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.6);
             border: 5px solid #fff;
-            user-select: none;
         }
 
         .feature-box {
@@ -96,7 +111,7 @@
         .feature-box h3 {
             margin-top: 0;
             margin-bottom: 5px;
-            font-size: 16px;
+            font-size: 15px;
             color: #66fcf1;
         }
 
@@ -110,52 +125,30 @@
             background-color: #66fcf1;
             color: #0b0c10;
             border: none;
-            padding: 10px 20px;
+            padding: 11px 20px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            transition: background 0.2s;
-        }
-
-        .share-btn:hover {
-            background-color: #45a29e;
         }
 
         .withdraw-btn {
-            background-color: #222;
-            color: #666;
-            border: 1px solid #333;
+            background-color: #1a1a1a;
+            color: #555;
+            border: 1px solid #2d2d2d;
             padding: 10px 20px;
             font-weight: bold;
             border-radius: 8px;
             cursor: not-allowed;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-badge {
-            background-color: #ff4a4a;
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            font-weight: bold;
-            display: inline-block;
-            margin-left: 8px;
-            vertical-align: middle;
         }
 
         .toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             background: #45a29e;
             color: white;
-            padding: 10px 20px;
+            padding: 10px 25px;
             border-radius: 20px;
             font-size: 14px;
             display: none;
@@ -165,11 +158,11 @@
 </head>
 <body>
 
-    <div class="game-container">
-        <h1>Bigger Coin</h1>
+    <div class="game-container" id="mainGame">
+        <h1 id="welcomeUser">Bigger Coin</h1>
         
         <div class="balance-container">
-            <div class="balance-label">Your Balance</div>
+            <div class="balance-label">Total Balance</div>
             <div class="balance-amount" id="balance">0</div>
         </div>
 
@@ -179,107 +172,114 @@
 
         <div class="feature-box">
             <h3>Invite Friends</h3>
-            <p>Get +500 coins instantly when a friend joins via your link!</p>
+            <p>Get +500 coins instantly when a friend starts tapping via your link!</p>
             <button class="share-btn" id="copyRefBtn">Copy Referral Link</button>
         </div>
 
         <div class="feature-box">
-            <h3>Withdrawal <span class="status-badge">Locked</span></h3>
-            <p>Coins cannot be withdrawn yet. Withdrawal functionality will automatically unlock as soon as Bigger Coin officially launches!</p>
+            <h3>Withdrawal</h3>
             <button class="withdraw-btn" disabled>🔒 Locked Until Launch</button>
         </div>
     </div>
 
-    <div class="toast" id="toast">Link copied!</div>
+    <div id="telegram-shield">
+        <div class="shield-icon">🤖</div>
+        <h2 style="color: #66fcf1;">Play inside Telegram</h2>
+        <p style="color: #c5c6c7; line-height: 1.5;">This game is optimized exclusively as a Telegram Mini App. Please open our official Bot link inside Telegram to start tapping and earning!</p>
+    </div>
+
+    <div class="toast" id="toast">Link Copied!</div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Realtime Network Sync Configuration
-        const firebaseConfig = {
-            databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/"
-        };
-        
-        // Initialize network link
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        // Connect to Firebase Network Engine
+        const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
-        // 1. Establish User Profile
-        let userId = localStorage.getItem('game_user_id');
-        if (!userId) {
-            userId = 'user_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('game_user_id', userId);
-        }
+        // Initialize Telegram WebApp interface
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Make app full screen automatically
 
-        let balance = 0;
-        const balanceDisplay = document.getElementById('balance');
-        const coinBtn = document.getElementById('coinBtn');
+        let userId = "";
+        let username = "Player";
 
-        // 2. Real-time Database Listener
-        // Automatically syncs balance over the internet whenever changes occur
-        const userRef = database.ref('users/' + userId);
-        userRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                balance = data.balance || 0;
-            } else {
-                balance = parseInt(localStorage.getItem('coin_balance')) || 0;
-                userRef.set({ balance: balance });
-            }
-            balanceDisplay.textContent = balance.toLocaleString();
-        });
-
-        // Tap Mechanics
-        coinBtn.addEventListener('click', () => {
-            balance += 1;
-            balanceDisplay.textContent = balance.toLocaleString();
-            localStorage.setItem('coin_balance', balance);
-            userRef.update({ balance: balance });
-        });
-
-        // 3. Automated Network Referral Logic
-        const urlParams = new URLSearchParams(window.location.search);
-        const referrerId = urlParams.get('ref');
-        const hasClaimedRef = localStorage.getItem('claimed_referral');
-
-        if (referrerId && referrerId !== userId && !hasClaimedRef) {
-            // Give incoming player 500 setup coins
-            balance += 500;
-            userRef.update({ balance: balance });
-            localStorage.setItem('claimed_referral', 'true');
-
-            // Send 500 coins to the person who invited them across the database
-            const referrerRef = database.ref('users/' + referrerId + '/balance');
-            referrerRef.transaction((currentBalance) => {
-                return (currentBalance || 0) + 500;
-            });
-
-            showToast("Welcome! Received 500 referral bonus coins!");
-        }
-
-        // Copy Referral Link Actions
-        const copyRefBtn = document.getElementById('copyRefBtn');
-        copyRefBtn.addEventListener('click', () => {
-            const cleanUrl = window.location.href.split('?')[0];
-            const referralLink = `${cleanUrl}?ref=${userId}`;
+        // TELEGRAM CHECK: If not in Telegram, block access completely like TapSwap
+        if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
+            document.getElementById('mainGame').style.display = 'none';
+            document.getElementById('telegram-shield').style.display = 'block';
+        } else {
+            // Read official live Telegram user profile parameters
+            userId = "tg_" + tg.initDataUnsafe.user.id;
+            username = tg.initDataUnsafe.user.first_name || "Player";
+            document.getElementById('welcomeUser').textContent = `👋 ${username}'s Coin`;
             
-            navigator.clipboard.writeText(referralLink).then(() => {
-                showToast("Referral link copied!");
-            }).catch(() => {
-                alert("Share this link: " + referralLink);
+            runGameLogic();
+        }
+
+        function runGameLogic() {
+            let balance = 0;
+            const balanceDisplay = document.getElementById('balance');
+            const coinBtn = document.getElementById('coinBtn');
+
+            // Connect profile records instantly to the database cloud
+            const userRef = database.ref('tg_users/' + userId);
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    balance = data.balance || 0;
+                } else {
+                    balance = 0;
+                    userRef.set({ balance: balance, name: username });
+                }
+                balanceDisplay.textContent = balance.toLocaleString();
             });
-        });
+
+            // Tap Mechanism
+            coinBtn.addEventListener('click', () => {
+                balance += 1;
+                balanceDisplay.textContent = balance.toLocaleString();
+                userRef.update({ balance: balance });
+            });
+
+            // Automated Cross-Device Referral Reward System
+            const urlParams = new URLSearchParams(window.location.search);
+            const referrerId = urlParams.get('ref');
+            const hasClaimedRef = localStorage.getItem('tg_claimed_ref');
+
+            if (referrerId && referrerId !== userId && !hasClaimedRef) {
+                // Reward inviter through transaction
+                database.ref('tg_users/' + referrerId + '/balance').transaction((current) => {
+                    return (current || 0) + 500;
+                });
+                
+                // Drop 200 initial setup welcome coins to the new invitee
+                balance += 200;
+                userRef.update({ balance: balance });
+                localStorage.setItem('tg_claimed_ref', 'true');
+                showToast("Joined via link! +200 Welcome Bonus!");
+            }
+
+            // Copy Link Generation targeting the clean platform address
+            document.getElementById('copyRefBtn').addEventListener('click', () => {
+                const cleanUrl = window.location.href.split('?')[0];
+                const referralLink = `${cleanUrl}?ref=${userId}`;
+                
+                navigator.clipboard.writeText(referralLink).then(() => {
+                    showToast("Referral Link Copied!");
+                }).catch(() => {
+                    alert("Share link: " + referralLink);
+                });
+            });
+        }
 
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.style.display = 'block';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 2500);
+            setTimeout(() => { toast.style.display = 'none'; }, 2500);
         }
     </script>
 </body>
