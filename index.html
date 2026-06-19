@@ -377,7 +377,7 @@
 
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Coins are deposited into your wallet balance instantly after submission verification.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Coins are deposited into your wallet balance after verification confirmation.</p>
             <div class="list-container">
                 <div class="card">
                     <div class="card-info">
@@ -447,6 +447,10 @@
 
     <script>
         const BOT_USERNAME = "BiggerCoinGameBot"; 
+
+        // ⚠️ PASTE YOUR TELEGRAM BOT CREDENTIALS HERE TO RECEIVE NOTIFICATIONS DIRECTLY IN YOUR INBOX
+        const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
+        const ADMIN_CHAT_ID = "YOUR_PERSONAL_TELEGRAM_NUMERIC_ID_HERE"; 
 
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -543,6 +547,7 @@
         let currentCoinReward = 0;
         let priceNgn = 0;
         let priceUsd = 0;
+        let selectedPaymentType = "";
 
         function selectPaymentPackage(coins, ngn, usd) {
             currentCoinReward = coins;
@@ -558,16 +563,15 @@
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Helper Clipboard Function Matrix 
         function clipText(textValue) {
             navigator.clipboard.writeText(textValue).then(() => {
                 showToast("Copied to Clipboard!");
             });
         }
 
-        // Detailed View Modals with inline Click-To-Copy fields built dynamically
         function openPaymentDetails(paymentType) {
             closeModal('currencyModal');
+            selectedPaymentType = paymentType;
             
             const title = document.getElementById('detailsTitle');
             const box = document.getElementById('detailsContentBox');
@@ -607,21 +611,44 @@
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // UNIFIED AUTOMATION PIPELINE (Fires completely uniformly across all 3 methods)
+        // ONE-DATA TELEGRAM INBOX DIRECT NOTIFIER PIPELINE
         document.getElementById('btnConfirmPaid').addEventListener('click', () => {
             const confirmBtn = document.getElementById('btnConfirmPaid');
-            confirmBtn.textContent = "Verifying Transaction with Bank Network...";
+            confirmBtn.textContent = "Sending Alert to Admin Inbox...";
             confirmBtn.disabled = true;
 
-            // 5 seconds simulated system synchronization process
-            setTimeout(() => {
-                database.ref('tg_game_users/' + userId + '/balance').transaction((currentBalance) => {
-                    return (currentBalance || 0) + currentCoinReward;
-                }).then(() => {
-                    closeModal('detailsModal');
-                    showToast(`Transaction Confirmed! +${currentCoinReward.toLocaleString()} Coins added.`);
-                });
-            }, 5000);
+            const finalPrice = (selectedPaymentType === 'paga') ? `₦${priceNgn.toLocaleString()}` : `$${priceUsd}.00`;
+            
+            // Format precise markup notification layout for your inbox
+            const notificationMessage = `🔔 *New Payment Logged!*\n\n` +
+                                          `👤 *Player:* ${username} (${userId})\n` +
+                                          `📦 *Package:* ${currentCoinReward.toLocaleString()} Coins\n` +
+                                          `💰 *Price:* ${finalPrice}\n` +
+                                          `💳 *Gateway:* ${selectedPaymentType.toUpperCase()}\n\n` +
+                                          `👉 *Action Required:* Verify your balance statement, then grant coins via Firebase for ${userId}`;
+
+            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+            fetch(telegramUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: ADMIN_CHAT_ID,
+                    text: notificationMessage,
+                    parse_mode: "Markdown"
+                })
+            })
+            .then(() => {
+                confirmBtn.textContent = "Awaiting Admin Verification...";
+                showToast("Notification dispatched! Awaiting processing.");
+                setTimeout(() => { closeModal('detailsModal'); }, 2000);
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Network alert dispatch error.");
+                confirmBtn.textContent = "I Have Made Payment";
+                confirmBtn.disabled = false;
+            });
         });
 
         function handleTask(platformId, URL, rewardAmt) {
