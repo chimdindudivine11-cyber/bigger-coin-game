@@ -140,11 +140,7 @@
             transition: width 0.1s linear;
         }
 
-        /* Lists and Cards */
-        .list-container {
-            width: 100%;
-        }
-
+        /* Cards and Lists */
         .card {
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -181,13 +177,69 @@
             cursor: pointer;
         }
 
-        .action-btn:disabled {
-            background-color: #333;
-            color: #666;
-            cursor: not-allowed;
+        /* Modal Overlay Window */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Nav Bar styling */
+        .modal-content {
+            background: #12131c;
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 20px;
+            width: 90%;
+            max-width: 360px;
+            box-sizing: border-box;
+            user-select: text;
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .copy-info {
+            background: rgba(255,255,255,0.03);
+            border: 1px dashed rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+
+        .payment-input {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Admin Layout Specifics */
+        .admin-request {
+            background: rgba(255, 193, 7, 0.05);
+            border: 1px solid #ffc107;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Navigation Bar */
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -232,10 +284,9 @@
             border-radius: 20px;
             font-size: 13px;
             display: none;
-            z-index: 1000;
+            z-index: 3000;
         }
 
-        /* Redirect Loader View */
         #redirect-screen {
             display: flex;
             flex-direction: column;
@@ -250,10 +301,10 @@
 <body>
 
     <div id="redirect-screen">
-        <div style="font-size: 50px; margin-bottom: 20px; animation: spin 2s infinite linear;">🪙</div>
+        <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
         <p style="color: var(--text-secondary); max-width: 300px; font-size: 14px; line-height: 1.5;">
-            Redirecting you securely to Telegram to start tapping and claiming rewards!
+            Redirecting you securely to Telegram to start tapping and earning rewards!
         </p>
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram Manually</button>
     </div>
@@ -270,15 +321,12 @@
                     <div class="coin-design">🪙</div>
                 </button>
             </div>
-            
             <div class="energy-box">
                 <div class="energy-text">
                     <span>⚡ Energy</span>
                     <span><span id="energy">500</span>/<span id="maxEnergy">500</span></span>
                 </div>
-                <div class="energy-bar-bg">
-                    <div class="energy-bar-fill" id="energyFill"></div>
-                </div>
+                <div class="energy-bar-bg"><div class="energy-bar-fill" id="energyFill"></div></div>
             </div>
         </div>
 
@@ -287,77 +335,91 @@
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
                 Earn +500 coins instantly when a friend joins via your link!
             </p>
-            <button class="action-btn" id="copyRefBtn" style="width:100%; padding:12px; font-size:14px; margin-bottom:20px;">
+            <button class="action-btn" id="copyRefBtn" style="width:100%; padding:12px; font-size:14px;">
                 🔗 Copy Referral Link
             </button>
-            <div class="list-container" id="referralsList">
-                <div style="text-align:center; color:#555; margin-top:20px; font-size:13px;">Your referrals are automatically verified via Telegram bot.</div>
-            </div>
         </div>
 
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px; width:100%;">You must complete the channel actions before you can claim your rewards!</p>
             <div class="list-container">
                 <div class="card">
-                    <div class="card-info">
-                        <h3>Join Telegram Channel</h3>
-                        <p>+5,000 Coins</p>
-                    </div>
+                    <div class="card-info"><h3>Join Telegram Channel</h3><p>+5,000 Coins</p></div>
                     <button class="action-btn" id="taskTgBtn" onclick="handleTask('tg', 'https://t.me/biggercointap', 5000)">Join</button>
                 </div>
                 <div class="card">
-                    <div class="card-info">
-                        <h3>Subscribe to YouTube</h3>
-                        <p>+5,000 Coins</p>
-                    </div>
+                    <div class="card-info"><h3>Subscribe to YouTube</h3><p>+5,000 Coins</p></div>
                     <button class="action-btn" id="taskYtBtn" onclick="handleTask('yt', 'https://www.youtube.com/@Biggercoin', 5000)">Subscribe</button>
                 </div>
             </div>
         </div>
 
         <div class="screen" id="screen-boost">
-            <h2 style="margin-top:0; color: var(--primary); width:100%;">Coin Purchase Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px; width:100%;">Want an advantage? Buy premium coin packages securely via Telegram Stars.</p>
+            <h2 style="margin-top:0; color: var(--primary); width:100%;">Coin Shop</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Buy coin packages. Submit confirmation to receive tokens upon review.</p>
             <div class="list-container">
                 <div class="card">
-                    <div class="card-info">
-                        <h3>Starter Pack (10,000 Coins)</h3>
-                        <p>Cost: 50 Stars</p>
-                    </div>
-                    <button class="action-btn" onclick="buyCoins(10000, 50)">Buy</button>
+                    <div class="card-info"><h3>Starter Pack (10,000 🪙)</h3><p>Price: $5 / ₦8,000</p></div>
+                    <button class="action-btn" onclick="openPaymentModal(10000)">Buy</button>
                 </div>
                 <div class="card">
-                    <div class="card-info">
-                        <h3>Whale Pack (100,000 Coins)</h3>
-                        <p>Cost: 250 Stars</p>
-                    </div>
-                    <button class="action-btn" onclick="buyCoins(100000, 250)">Buy</button>
+                    <div class="card-info"><h3>Whale Pack (100,000 🪙)</h3><p>Price: $45 / ₦72,000</p></div>
+                    <button class="action-btn" onclick="openPaymentModal(100000)">Buy</button>
                 </div>
-                <div class="card" style="margin-top: 15px; border-color: rgba(102,252,241,0.2);">
-                    <div class="card-info">
-                        <h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3>
-                        <p>Cost: <span id="multitapCost">100</span> 🪙</p>
-                    </div>
+                <div class="card" style="margin-top:15px;">
+                    <div class="card-info"><h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3><p>Cost: <span id="multitapCost">100</span> 🪙</p></div>
                     <button class="action-btn" id="buyMultitap">Upgrade</button>
                 </div>
             </div>
         </div>
 
+        <div class="screen" id="screen-admin">
+            <h2 style="margin-top:0; color: #ffc107; width:100%;">Admin Dashboard</h2>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:15px; width:100%;">Review submitted customer transaction receipts. Approve to drop coins immediately.</p>
+            <div class="list-container" id="adminRequestsList">
+                <div style="text-align:center; color:#555; font-size:13px; padding-top:20px;">No pending order confirmations.</div>
+            </div>
+        </div>
+
         <nav class="nav-bar">
-            <button class="nav-item active" onclick="switchTab('tap')">
-                <div class="nav-icon">🪙</div><div>Tap</div>
-            </button>
-            <button class="nav-item" onclick="switchTab('ref')">
-                <div class="nav-icon">👥</div><div>Ref</div>
-            </button>
-            <button class="nav-item" onclick="switchTab('tasks')">
-                <div class="nav-icon">📋</div><div>Tasks</div>
-            </button>
-            <button class="nav-item" onclick="switchTab('boost')">
-                <div class="nav-icon">🚀</div><div>Store</div>
-            </button>
+            <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
+            <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
+            <button class="nav-item" onclick="switchTab('tasks')"><div class="nav-icon">📋</div><div>Tasks</div></button>
+            <button class="nav-item" onclick="switchTab('boost')"><div class="nav-icon">🚀</div><div>Store</div></button>
+            <button class="nav-item" id="adminTabBtn" onclick="switchTab('admin')" style="display:none;"><div class="nav-icon">🔑</div><div>Admin</div></button>
         </nav>
+    </div>
+
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h3 id="modalPackTitle">Purchase Coins</h3>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:10px;">Select a method to settle payment, then drop your reference info below.</p>
+            
+            <div style="height:220px; overflow-y:auto; padding-right:5px; margin-bottom:15px;">
+                <div class="copy-info">
+                    <b style="color:var(--primary);">🇳🇬 PAGA DETAILS:</b><br>
+                    Account No: 1030800448<br>
+                    Name: Divine Lambert<br>
+                    Paga Tag: divinelambert6
+                </div>
+                <div class="copy-info">
+                    <b style="color:var(--primary);">💵 PAYPAL DETAILS:</b><br>
+                    Email: ocboystone11@gmail.com<br>
+                    Name: Divine Lambert
+                </div>
+                <div class="copy-info">
+                    <b style="color:var(--primary);">🌐 CRYPTO (USDT BEP-20):</b><br>
+                    <span style="font-size:11px; color:#ff4a4a;">Only send BEP20 network tokens!</span><br>
+                    Address: 0xa486E565d9e0D7B306759bf27eFCA03a06159ee1
+                </div>
+            </div>
+
+            <input type="text" class="payment-input" id="proofInput" placeholder="Enter Sender Name or Ref ID...">
+            <div style="display:flex; gap:10px;">
+                <button class="action-btn" style="flex:1; background:#444; color:#fff;" onclick="closeModal()">Cancel</button>
+                <button class="action-btn" style="flex:1;" id="submitPaymentBtn">Submit Proof</button>
+            </div>
+        </div>
     </div>
 
     <div class="toast" id="toast">Link Copied!</div>
@@ -366,48 +428,43 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Configuration Parameters - REPLACE bot_username WITH YOUR REAL BOT USERNAME BELOW
         const BOT_USERNAME = "BiggerCoinGameBot"; 
+        
+        // PASTE YOUR OFFICIAL TELEGRAM USER ID NUMBER INSIDE THIS ARRAY TO REVEAL THE ADMIN TAB
+        const ADMIN_TELEGRAM_IDS = ["tg_7265819409", "tg_YOUR_ID"]; 
 
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
         const tg = window.Telegram.WebApp;
-        
-        // Extract query parameters for referrals
         const urlParams = new URLSearchParams(window.location.search);
         const referrerId = urlParams.get('ref');
 
-        // ROUTING SYSTEM: If opened outside Telegram, build deep-link and redirect immediately
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
-            let telegramBotLink = `https://t.me/${BOT_USERNAME}`;
-            if (referrerId) {
-                // Passes referral codes perfectly down into the bot context
-                telegramBotLink += `?start=${referrerId}`;
-            }
-            
-            document.getElementById('manualRedirectBtn').onclick = () => { window.location.href = telegramBotLink; };
-            // Automatic instant routing
-            window.location.href = telegramBotLink;
+            let botLink = `https://t.me/${BOT_USERNAME}`;
+            if (referrerId) botLink += `?start=${referrerId}`;
+            document.getElementById('manualRedirectBtn').onclick = () => { window.location.href = botLink; };
+            window.location.href = botLink;
         } else {
-            // Inside Telegram context: Hide loader shield and turn app container on
             document.getElementById('redirect-screen').style.display = 'none';
             document.getElementById('appMain').style.display = 'flex';
             tg.expand();
             
             var userId = "tg_" + tg.initDataUnsafe.user.id;
             var username = tg.initDataUnsafe.user.first_name || "Player";
+            
+            // Check if player is an Admin
+            if (ADMIN_TELEGRAM_IDS.includes(userId)) {
+                document.getElementById('adminTabBtn').style.display = 'flex';
+                loadAdminDashboard();
+            }
+            
             initGameEngine();
         }
 
         function initGameEngine() {
-            let balance = 0;
-            let currentEnergy = 500;
-            let maxEnergy = 500;
-            let tapMultiplier = 1;
-            let multitapLvl = 1;
-
+            let balance = 0, currentEnergy = 500, maxEnergy = 500, tapMultiplier = 1, multitapLvl = 1;
             const userRef = database.ref('tg_game_users/' + userId);
 
             const balanceDisplay = document.getElementById('balance');
@@ -416,14 +473,12 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
-            // Connect Realtime Sync
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     balance = data.balance || 0;
                     multitapLvl = data.multitapLvl || 1;
                     tapMultiplier = multitapLvl;
-                    
                     mLevelDisp.textContent = multitapLvl;
                     mCostDisp.textContent = multitapLvl * 100;
                 } else {
@@ -432,7 +487,6 @@
                 balanceDisplay.textContent = balance.toLocaleString();
             });
 
-            // Energy Bar Loop
             setInterval(() => {
                 if (currentEnergy < maxEnergy) {
                     currentEnergy = Math.min(maxEnergy, currentEnergy + 1);
@@ -441,12 +495,10 @@
                 }
             }, 1500);
 
-            // Tap Event
             document.getElementById('coinBtn').addEventListener('click', () => {
                 if (currentEnergy >= tapMultiplier) {
                     currentEnergy -= tapMultiplier;
                     balance += tapMultiplier;
-                    
                     energyDisplay.textContent = currentEnergy;
                     energyFill.style.width = (currentEnergy / maxEnergy) * 100 + "%";
                     balanceDisplay.textContent = balance.toLocaleString();
@@ -454,7 +506,6 @@
                 }
             });
 
-            // Shop Upgrades
             document.getElementById('buyMultitap').addEventListener('click', () => {
                 let cost = multitapLvl * 100;
                 if (balance >= cost) {
@@ -464,70 +515,101 @@
                 } else { alert("Not enough coins!"); }
             });
 
-            // Process referral payload tracking inside App
             if (referrerId && referrerId !== userId && !localStorage.getItem('tg_bcoin_ref')) {
-                database.ref('tg_game_users/' + referrerId + '/balance').transaction((current) => {
-                    return (current || 0) + 500; 
-                });
+                database.ref('tg_game_users/' + referrerId + '/balance').transaction((current) => { return (current || 0) + 500; });
                 balance += 200;
                 userRef.update({ balance: balance });
                 localStorage.setItem('tg_bcoin_ref', 'true');
             }
 
-            // Referral button creation
             document.getElementById('copyRefBtn').addEventListener('click', () => {
                 const referralLink = `https://bigger-coin-game.onrender.com?ref=${userId}`;
-                navigator.clipboard.writeText(referralLink).then(() => {
-                    showToast("Referral Link Copied!");
+                navigator.clipboard.writeText(referralLink).then(() => { showToast("Referral Link Copied!"); });
+            });
+        }
+
+        // Purchasing Modal Handling
+        let targetCoins = 0;
+        function openPaymentModal(coinAmount) {
+            targetCoins = coinAmount;
+            document.getElementById('modalPackTitle').textContent = `Order ${coinAmount.toLocaleString()} Coins`;
+            document.getElementById('proofInput').value = "";
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('paymentModal').style.display = 'none'; }
+
+        document.getElementById('submitPaymentBtn').addEventListener('click', () => {
+            const proofText = document.getElementById('proofInput').value.trim();
+            if (!proofText) { alert("Please enter payment confirmation info!"); return; }
+
+            // Log submission metadata over central pipeline database for admin validation
+            const requestRef = database.ref('purchase_requests').push();
+            requestRef.set({
+                uid: userId,
+                buyerName: username,
+                coinsRequested: targetCoins,
+                paymentProof: proofText,
+                timestamp: Date.now()
+            }).then(() => {
+                closeModal();
+                showToast("Proof submitted! Awaiting Admin review.");
+            });
+        });
+
+        // HIDDEN ADMIN INTERFACES - Only maps values if caller ID exists inside ADMIN_TELEGRAM_IDS
+        function loadAdminDashboard() {
+            const container = document.getElementById('adminRequestsList');
+            database.ref('purchase_requests').on('value', (snapshot) => {
+                container.innerHTML = "";
+                const data = snapshot.val();
+                if (!data) {
+                    container.innerHTML = `<div style="text-align:center; color:#555; font-size:13px; padding-top:20px;">No pending orders found.</div>`;
+                    return;
+                }
+
+                Object.keys(data).forEach((key) => {
+                    const req = data[key];
+                    const div = document.createElement('div');
+                    div.className = "admin-request";
+                    div.innerHTML = `
+                        <div style="font-size:13px; margin-bottom:5px;"><b>Buyer:</b> ${req.buyerName}</div>
+                        <div style="font-size:13px; margin-bottom:5px; color:#66fcf1;"><b>Pack:</b> ${req.coinsRequested.toLocaleString()} Coins</div>
+                        <div style="font-size:12px; background:rgba(0,0,0,0.3); padding:6px; border-radius:4px; margin-bottom:8px;"><b>Proof:</b> ${req.paymentProof}</div>
+                        <button class="action-btn" style="background:#28a745; width:100%;" onclick="approvePurchase('${key}', '${req.uid}', ${req.coinsRequested})">✓ Approve & Credit</button>
+                    `;
+                    container.appendChild(div);
                 });
             });
         }
 
-        // TapSwap Task Flow: Forces link opening first, transitions button to 'Verify', then awards coins
+        function approvePurchase(requestId, targetUid, coinsToAward) {
+            // Transaction pipeline credits player wallet automatically
+            database.ref('tg_game_users/' + targetUid + '/balance').transaction((current) => {
+                return (current || 0) + coinsToAward;
+            }).then(() => {
+                // Delete processing sheet from node list queue
+                database.ref('purchase_requests/' + requestId).remove();
+                showToast("Coins credited successfully!");
+            });
+        }
+
         function handleTask(platformId, URL, rewardAmt) {
             const btn = platformId === 'tg' ? document.getElementById('taskTgBtn') : document.getElementById('taskYtBtn');
-            
             if (btn.textContent === "Join" || btn.textContent === "Subscribe") {
-                // Open community assets in external secure frames
                 tg.openLink(URL);
-                
-                // Advance task state to verification state
                 btn.textContent = "Verify";
                 btn.style.backgroundColor = "#ffc107";
-                localStorage.setItem(`task_state_${platformId}`, 'verifying');
             } else if (btn.textContent === "Verify") {
                 btn.textContent = "Checking...";
                 btn.disabled = true;
-                
                 setTimeout(() => {
-                    let curBal = parseInt(document.getElementById('balance').textContent.replace(/,/g, '')) || 0;
-                    curBal += rewardAmt;
-                    document.getElementById('balance').textContent = curBal.toLocaleString();
-                    
-                    database.ref('tg_game_users/' + userId).update({ balance: curBal });
+                    database.ref('tg_game_users/' + userId + '/balance').transaction((current) => { return (current || 0) + rewardAmt; });
                     btn.textContent = "Claimed ✓";
                     btn.style.backgroundColor = "#28a745";
                     showToast(`+${rewardAmt.toLocaleString()} Coins Claimed!`);
                 }, 3000);
             }
-        }
-
-        // Star Shop Integration Trigger
-        function buyCoins(coinAmount, starPrice) {
-            tg.showPopup({
-                title: 'Confirm Purchase',
-                message: `Would you like to buy ${coinAmount.toLocaleString()} Bigger Coins for ${starPrice} Telegram Stars?`,
-                buttons: [{id: 'buy', type: 'default', text: 'Pay Now'}, {type: 'cancel'}]
-            }, (buttonId) => {
-                if (buttonId === 'buy') {
-                    // For demo simulations, adds coins instantly. Real payments settle using a Telegram Bot connection.
-                    let curBal = parseInt(document.getElementById('balance').textContent.replace(/,/g, '')) || 0;
-                    curBal += coinAmount;
-                    document.getElementById('balance').textContent = curBal.toLocaleString();
-                    database.ref('tg_game_users/' + userId).update({ balance: curBal });
-                    showToast("Purchase Successful!");
-                }
-            });
         }
 
         function switchTab(tabId) {
