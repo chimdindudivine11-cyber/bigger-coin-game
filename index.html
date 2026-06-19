@@ -50,22 +50,39 @@
             text-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
         }
 
-        .balance-box {
-            font-size: 42px;
+        .balance-box-container {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .balance-sub-box {
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-amount {
+            font-size: 24px;
             font-weight: bold;
             color: #ffffff;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            margin-top: 2px;
         }
 
         .screen {
             display: none;
             padding: 15px;
             overflow-y: auto;
-            height: calc(100vh - 180px);
+            height: calc(100vh - 200px);
             width: 100%;
             box-sizing: border-box;
         }
@@ -244,7 +261,6 @@
             line-height: 1.6;
         }
 
-        /* Copyable Field Highlight styling */
         .copyable-field {
             background: rgba(102, 252, 241, 0.08);
             border: 1px solid rgba(102, 252, 241, 0.2);
@@ -256,11 +272,7 @@
             margin: 2px 0;
             font-weight: 500;
         }
-        .copyable-field:active {
-            background: rgba(102, 252, 241, 0.25);
-        }
 
-        /* Navigation Bar Menu Tab Bar */
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -333,7 +345,16 @@
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
-            <div class="balance-box">🪙 <span id="balance">0</span></div>
+            <div class="balance-box-container">
+                <div class="balance-sub-box">
+                    <div class="balance-label">Tapped Balance</div>
+                    <div class="balance-amount" style="color: #f7b924;">🪙 <span id="tapBalance">0</span></div>
+                </div>
+                <div class="balance-sub-box" style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+                    <div class="balance-label">Store Balance</div>
+                    <div class="balance-amount" style="color: var(--primary);">💎 <span id="shopBalance">0</span></div>
+                </div>
+            </div>
         </div>
 
         <div class="screen active" id="screen-tap">
@@ -354,7 +375,7 @@
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
-                Earn +500 coins instantly when a friend joins via your link!
+                Earn +500 Tapped Coins instantly when a friend joins via your link!
             </p>
             <button class="action-btn" id="copyRefBtn" style="width:100%; padding:12px; font-size:14px;">
                 🔗 Copy Referral Link
@@ -363,13 +384,13 @@
 
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
-            <div class="list-container">
+            <div class="list-container" style="width:100%;">
                 <div class="card">
-                    <div class="card-info"><h3>Join Telegram Channel</h3><p>+5,000 Coins</p></div>
+                    <div class="card-info"><h3>Join Telegram Channel</h3><p>+5,000 Tapped Coins</p></div>
                     <button class="action-btn" id="taskTgBtn" onclick="handleTask('tg', 'https://t.me/biggercointap', 5000)">Join</button>
                 </div>
                 <div class="card">
-                    <div class="card-info"><h3>Subscribe to YouTube</h3><p>+5,000 Coins</p></div>
+                    <div class="card-info"><h3>Subscribe to YouTube</h3><p>+5,000 Tapped Coins</p></div>
                     <button class="action-btn" id="taskYtBtn" onclick="handleTask('yt', 'https://www.youtube.com/@Biggercoin', 5000)">Subscribe</button>
                 </div>
             </div>
@@ -377,26 +398,34 @@
 
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Coins are deposited into your wallet balance after verification confirmation.</p>
-            <div class="list-container">
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Purchased coins are safely deposited into your Store Balance after verification.</p>
+            <div class="list-container" style="width:100%;">
                 <div class="card">
                     <div class="card-info">
-                        <h3>Starter Pack (10,000 🪙)</h3>
+                        <h3>Starter Pack (10,000 💎)</h3>
                         <p style="color:var(--primary); font-weight:600;">₦3,000 / $4.00</p>
                     </div>
                     <button class="action-btn" onclick="selectPaymentPackage(10000, 3000, 4)">Buy Pack</button>
                 </div>
                 <div class="card">
                     <div class="card-info">
-                        <h3>Whale Pack (100,000 🪙)</h3>
+                        <h3>Whale Pack (100,000 💎)</h3>
                         <p style="color:var(--primary); font-weight:600;">₦10,000 / $11.00</p>
                     </div>
                     <button class="action-btn" onclick="selectPaymentPackage(100000, 10000, 11)">Buy Pack</button>
                 </div>
                 <div class="card" style="margin-top:15px;">
-                    <div class="card-info"><h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3><p>Cost: <span id="multitapCost">100</span> 🪙</p></div>
+                    <div class="card-info"><h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3><p>Cost: <span id="multitapCost">100</span> Tapped Coins</p></div>
                     <button class="action-btn" id="buyMultitap">Upgrade</button>
                 </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-admin">
+            <h2 style="margin-top:0; color: #ff4a4a; width:100%;">Admin Approval Desk</h2>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:15px; width:100%;">Review ledger logs and approve store coin issuance below.</p>
+            <div id="adminQueueContainer" style="width:100%;">
+                <p style="font-size:13px; color:gray; text-align:center; margin-top:20px;">No pending payment logs found.</p>
             </div>
         </div>
 
@@ -405,24 +434,16 @@
             <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
             <button class="nav-item" onclick="switchTab('tasks')"><div class="nav-icon">📋</div><div>Tasks</div></button>
             <button class="nav-item" onclick="switchTab('boost')"><div class="nav-icon">🚀</div><div>Store</div></button>
+            <button class="nav-item" id="navAdminBtn" style="display:none;" onclick="switchTab('admin')"><div class="nav-icon">🛠️</div><div>Admin</div></button>
         </nav>
     </div>
 
     <div class="modal" id="currencyModal">
         <div class="modal-content">
             <h3>Select Payment Option</h3>
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Choose your preferred billing channel below.</p>
-            
-            <button class="currency-option-btn" onclick="openPaymentDetails('paga')">
-                <span>🇳🇬 Paga Bank Transfer</span><span style="color:var(--primary);" id="lblNairaPrice">₦0</span>
-            </button>
-            <button class="currency-option-btn" onclick="openPaymentDetails('paypal')">
-                <span>💵 PayPal Account</span><span style="color:var(--primary);" id="lblDollarPrice">$0.00</span>
-            </button>
-            <button class="currency-option-btn" onclick="openPaymentDetails('usdt')">
-                <span>🟢 Crypto Wallet (USDT)</span><span style="color:var(--primary);" id="lblUsdtPrice">$0.00</span>
-            </button>
-            
+            <button class="currency-option-btn" onclick="openPaymentDetails('paga')"><span>🇳🇬 Paga Bank Transfer</span><span style="color:var(--primary);" id="lblNairaPrice">₦0</span></button>
+            <button class="currency-option-btn" onclick="openPaymentDetails('paypal')"><span>💵 PayPal Account</span><span style="color:var(--primary);" id="lblDollarPrice">$0.00</span></button>
+            <button class="currency-option-btn" onclick="openPaymentDetails('usdt')"><span>🟢 Crypto Wallet (USDT)</span><span style="color:var(--primary);" id="lblUsdtPrice">$0.00</span></button>
             <button class="action-btn" style="background:#444; color:#fff; width:100%; margin-top:5px; padding:10px;" onclick="closeModal('currencyModal')">Cancel</button>
         </div>
     </div>
@@ -430,11 +451,7 @@
     <div class="modal" id="detailsModal">
         <div class="modal-content">
             <h3 id="detailsTitle">Transfer Funds</h3>
-            <p style="font-size:11px; color:var(--text-secondary); margin-bottom:12px;">👉 Tap any highlighted value to copy it instantly!</p>
-            
-            <div class="details-box" id="detailsContentBox">
-                </div>
-
+            <div class="details-box" id="detailsContentBox"></div>
             <button class="action-btn" id="btnConfirmPaid" style="width:100%; padding:12px; font-size:13px; margin-bottom:10px;">I Have Made Payment</button>
             <button class="action-btn" style="background:#444; color:#fff; width:100%; padding:10px;" onclick="closeModal('detailsModal')">Go Back</button>
         </div>
@@ -446,11 +463,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        const BOT_USERNAME = "BiggerCoinGameBot"; 
-
-        // ⚠️ EDIT THESE TWO LINES WITH YOUR BOT TOKEN AND YOUR NUMERIC ID (Get ID from @userinfobot)
+        // ⚠️ REMEMBER TO PUT YOUR RUNNING BOT INFO HERE:
+        const BOT_USERNAME = "YOUR_ACTUAL_BOT_USERNAME_HERE"; 
+        const ADMIN_CHAT_ID = "YOUR_NUMERIC_TELEGRAM_ID_HERE"; 
         const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
-        const ADMIN_CHAT_ID = "YOUR_PERSONAL_TELEGRAM_NUMERIC_ID_HERE"; 
 
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -462,6 +478,14 @@
 
         var userId = "guest_user";
         var username = "Player";
+        var userTgHandle = "";
+
+        // Core memory engine states updated live via Firebase synchronization directly
+        let liveTapBalance = 0;
+        let liveShopBalance = 0;
+        let multitapLvl = 1;
+        let currentEnergy = 500;
+        let maxEnergy = 500;
 
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
             let botLink = `https://t.me/${BOT_USERNAME}`;
@@ -475,33 +499,45 @@
             
             userId = "tg_" + tg.initDataUnsafe.user.id;
             username = tg.initDataUnsafe.user.first_name || "Player";
+            userTgHandle = tg.initDataUnsafe.user.username || "";
+            
+            if (tg.initDataUnsafe.user.id.toString() === ADMIN_CHAT_ID.trim()) {
+                document.getElementById('navAdminBtn').style.display = 'flex';
+                listenForAdminLogs();
+            }
+            
             initGameEngine();
         }
 
         function initGameEngine() {
-            let balance = 0, currentEnergy = 500, maxEnergy = 500, tapMultiplier = 1, multitapLvl = 1;
             const userRef = database.ref('tg_game_users/' + userId);
 
-            const balanceDisplay = document.getElementById('balance');
+            const tapDisplay = document.getElementById('tapBalance');
+            const shopDisplay = document.getElementById('shopBalance');
             const energyDisplay = document.getElementById('energy');
             const energyFill = document.getElementById('energyFill');
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
+            // LIVE APP SYNCHRONIZER REALTIME LISTENER (Loads saved values from Firebase perfectly)
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    balance = data.balance || 0;
+                    liveTapBalance = data.tapBalance || 0;
+                    liveShopBalance = data.shopBalance || 0;
                     multitapLvl = data.multitapLvl || 1;
-                    tapMultiplier = multitapLvl;
+                    
                     mLevelDisp.textContent = multitapLvl;
                     mCostDisp.textContent = multitapLvl * 100;
                 } else {
-                    userRef.set({ balance: 0, multitapLvl: 1, name: username });
+                    // Initialize empty clean ledger profile
+                    userRef.set({ tapBalance: 0, shopBalance: 0, multitapLvl: 1, name: username, handle: userTgHandle });
                 }
-                balanceDisplay.textContent = balance.toLocaleString();
+                tapDisplay.textContent = liveTapBalance.toLocaleString();
+                shopDisplay.textContent = liveShopBalance.toLocaleString();
             });
 
+            // Energy restoration loop ticker
             setInterval(() => {
                 if (currentEnergy < maxEnergy) {
                     currentEnergy = Math.min(maxEnergy, currentEnergy + 1);
@@ -510,70 +546,59 @@
                 }
             }, 1500);
 
+            // COIN BUTTON TAP ACTION (Updates live variables and saves immediately to Firebase node)
             document.getElementById('coinBtn').addEventListener('click', () => {
-                if (currentEnergy >= tapMultiplier) {
-                    currentEnergy -= tapMultiplier;
-                    balance += tapMultiplier;
+                if (currentEnergy >= multitapLvl) {
+                    currentEnergy -= multitapLvl;
+                    liveTapBalance += multitapLvl;
+                    
                     energyDisplay.textContent = currentEnergy;
                     energyFill.style.width = (currentEnergy / maxEnergy) * 100 + "%";
-                    balanceDisplay.textContent = balance.toLocaleString();
-                    userRef.update({ balance: balance });
+                    tapDisplay.textContent = liveTapBalance.toLocaleString();
+                    
+                    // Direct Firebase writing keeps data saved if user instantly closes app
+                    userRef.update({ tapBalance: liveTapBalance });
                 }
             });
 
             document.getElementById('buyMultitap').addEventListener('click', () => {
                 let cost = multitapLvl * 100;
-                if (balance >= cost) {
-                    balance -= cost;
+                if (liveTapBalance >= cost) {
+                    liveTapBalance -= cost;
                     multitapLvl += 1;
-                    userRef.update({ balance: balance, multitapLvl: multitapLvl });
-                } else { alert("Not enough coins!"); }
+                    userRef.update({ tapBalance: liveTapBalance, multitapLvl: multitapLvl });
+                } else { alert("Not enough Tapped Coins!"); }
             });
 
             if (referrerId && referrerId !== userId && !localStorage.getItem('tg_bcoin_ref')) {
-                database.ref('tg_game_users/' + referrerId + '/balance').transaction((current) => { return (current || 0) + 500; });
-                balance += 200;
-                userRef.update({ balance: balance });
+                database.ref('tg_game_users/' + referrerId + '/tapBalance').transaction((curr) => (curr || 0) + 500);
+                liveTapBalance += 200;
+                userRef.update({ tapBalance: liveTapBalance });
                 localStorage.setItem('tg_bcoin_ref', 'true');
             }
 
             document.getElementById('copyRefBtn').addEventListener('click', () => {
-                const referralLink = `https://bigger-coin-game.onrender.com?ref=${userId}`;
+                const referralLink = `https://t.me/${BOT_USERNAME}?start=${tg.initDataUnsafe.user.id}`;
                 navigator.clipboard.writeText(referralLink).then(() => { showToast("Referral Link Copied!"); });
             });
         }
 
-        // Global Parameters
-        let currentCoinReward = 0;
-        let priceNgn = 0;
-        let priceUsd = 0;
-        let selectedPaymentType = "";
+        let currentCoinReward = 0, priceNgn = 0, priceUsd = 0, selectedPaymentType = "";
 
         function selectPaymentPackage(coins, ngn, usd) {
-            currentCoinReward = coins;
-            priceNgn = ngn;
-            priceUsd = usd;
-
+            currentCoinReward = coins; priceNgn = ngn; priceUsd = usd;
             document.getElementById('lblNairaPrice').textContent = `₦${ngn.toLocaleString()}`;
             document.getElementById('lblDollarPrice').textContent = `$${usd}.00`;
             document.getElementById('lblUsdtPrice').textContent = `$${usd}.00`;
-
             document.getElementById('currencyModal').style.display = 'flex';
         }
 
-        // Clean element closing tool
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function clipText(textValue) {
-            navigator.clipboard.writeText(textValue).then(() => {
-                showToast("Copied to Clipboard!");
-            });
-        }
+        function clipText(textValue) { navigator.clipboard.writeText(textValue).then(() => { showToast("Copied!"); }); }
 
         function openPaymentDetails(paymentType) {
             closeModal('currencyModal');
             selectedPaymentType = paymentType;
-            
             const title = document.getElementById('detailsTitle');
             const box = document.getElementById('detailsContentBox');
             const confirmBtn = document.getElementById('btnConfirmPaid');
@@ -584,8 +609,8 @@
             if (paymentType === 'paga') {
                 title.textContent = "Paga Transfer Details";
                 box.innerHTML = `
-                    <b>Amount to Send:</b> <span class="copyable-field" onclick="clipText('${priceNgn}')">₦${priceNgn.toLocaleString()}</span><br>
-                    <b>Bank Name:</b> Paga (Moni Pay)<br>
+                    <b>Amount:</b> <span class="copyable-field" onclick="clipText('${priceNgn}')">₦${priceNgn.toLocaleString()}</span><br>
+                    <b>Bank:</b> Paga (Moni Pay)<br>
                     <b>Account Number:</b> <span class="copyable-field" onclick="clipText('1030800448')">1030800448 📋</span><br>
                     <b>Account Name:</b> Divine Lambert<br>
                     <b>Paga Tag:</b> <span class="copyable-field" onclick="clipText('divinelambert6')">divinelambert6 📋</span>
@@ -593,83 +618,103 @@
             } else if (paymentType === 'paypal') {
                 title.textContent = "PayPal Settlement Link";
                 box.innerHTML = `
-                    <b>Amount to Send:</b> <span class="copyable-field" onclick="clipText('${priceUsd}')">$${priceUsd}.00 USD</span><br>
+                    <b>Amount:</b> <span class="copyable-field" onclick="clipText('${priceUsd}')">$${priceUsd}.00 USD</span><br>
                     <b>PayPal Email:</b> <span class="copyable-field" onclick="clipText('ocboystone11@gmail.com')">ocboystone11@gmail.com 📋</span><br>
-                    <b>Account Holder:</b> Divine Lambert<br><br>
-                    <small style="color:var(--text-secondary);">Please use the "Friends & Family" settlement option inside your PayPal app.</small>
+                    <b>Account Holder:</b> Divine Lambert
                 `;
             } else if (paymentType === 'usdt') {
                 title.textContent = "USDT Crypto Settlement";
                 box.innerHTML = `
-                    <b>Amount to Send:</b> <span class="copyable-field" onclick="clipText('${priceUsd}')">$${priceUsd}.00 USDT</span><br>
-                    <b>Network Ecosystem:</b> <span style="color:#ff4a4a; font-weight:bold;">BEP-20 (BNB Smart Chain)</span><br>
+                    <b>Amount:</b> <span class="copyable-field" onclick="clipText('${priceUsd}')">$${priceUsd}.00 USDT</span><br>
+                    <b>Network:</b> <span style="color:#ff4a4a; font-weight:bold;">BEP-20 (BNB Smart Chain)</span><br>
                     <b>Wallet Address:</b><br>
-                    <span class="copyable-field" style="font-family:monospace; font-size:11px;" onclick="clipText('0xa486E565d9e0D7B306759bf27eFCA03a06159ee1')">0xa486E565d9e0D7B306759bf27eFCA03a06159ee1 📋</span><br><br>
-                    <small style="color:#ffc107;">Attention: Transferring coins over any other network results in a lost payment.</small>
+                    <span class="copyable-field" style="font-family:monospace; font-size:11px;" onclick="clipText('0xa486E565d9e0D7B306759bf27eFCA03a06159ee1')">0xa486E565d9e0D7B306759bf27eFCA03a06159ee1 📋</span>
                 `;
             }
-
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // ONE-DATA SECURE TELEGRAM DISPATCH PIPELINE WITH DATABASE BACKUP PROTECTION
         document.getElementById('btnConfirmPaid').addEventListener('click', () => {
             const confirmBtn = document.getElementById('btnConfirmPaid');
             confirmBtn.textContent = "Submitting Order Request...";
             confirmBtn.disabled = true;
 
             const finalPrice = (selectedPaymentType === 'paga') ? `₦${priceNgn.toLocaleString()}` : `$${priceUsd}.00`;
-            const timestamp = new Date().toISOString();
+            const logId = userId + "_" + Date.now();
             
-            // 1. Write the payment metadata into Firebase right away so you can see it in your database dashboard
             const paymentLogData = {
+                logId: logId,
                 userId: userId,
                 username: username,
+                handle: userTgHandle,
                 coinsRequested: currentCoinReward,
                 price: finalPrice,
                 method: selectedPaymentType,
-                status: "pending",
-                time: timestamp
+                time: new Date().toLocaleTimeString()
             };
 
-            database.ref('pending_payments/' + userId + "_" + Date.now()).set(paymentLogData);
+            database.ref('pending_payments/' + logId).set(paymentLogData);
 
-            // 2. Format detailed text payload notification for your Telegram inbox
-            const notificationMessage = `🔔 *New Payment Logged!*\n\n` +
-                                          `👤 *Player:* ${username} (\`${userId}\`)\n` +
-                                          `📦 *Package:* ${currentCoinReward.toLocaleString()} Coins\n` +
-                                          `💰 *Price:* ${finalPrice}\n` +
-                                          `💳 *Gateway:* ${selectedPaymentType.toUpperCase()}\n\n` +
-                                          `👉 *Action Required:* Verify your account balance statements, then manually update balance in Firebase for user ID: \`${userId}\``;
+            const chatLink = userTgHandle ? `https://t.me/${userTgHandle}` : `tg://user?id=${userId.replace('tg_','')}`;
+            const msg = `🔔 *New Payment Filed!*\n\n👤 *User:* ${username}\n📦 *Order:* ${currentCoinReward.toLocaleString()} Store Coins\n💰 *Price:* ${finalPrice}\n💳 *Gateway:* ${selectedPaymentType.toUpperCase()}\n\n💬 [Click here to Message Player](${chatLink})`;
 
-            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-
-            // 3. Attempt to dispatch to Telegram Bot interface
-            fetch(telegramUrl, {
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    chat_id: ADMIN_CHAT_ID,
-                    text: notificationMessage,
-                    parse_mode: "Markdown"
-                })
-            })
-            .then(res => {
-                // Check if Telegram accepted the request or if it's using placeholder text
-                if (!res.ok) { throw new Error("Bot configuration placeholder detected"); }
-                
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg, parse_mode: "Markdown" })
+            }).finally(() => {
                 confirmBtn.textContent = "Awaiting Verification...";
-                showToast("Request sent! Awaiting admin processing.");
-                setTimeout(() => { closeModal('detailsModal'); }, 2500);
-            })
-            .catch(err => {
-                console.warn("Telegram Notification system caught error: ", err.message);
-                // SAFE RECOVERY FALLBACK: If bot fails/placeholders are active, still process gracefully via Firebase log
-                confirmBtn.textContent = "Awaiting Verification...";
-                showToast("Order logged under review! Awaiting verification.");
-                setTimeout(() => { closeModal('detailsModal'); }, 2500);
+                showToast("Request sent to Admin desk!");
+                setTimeout(() => { closeModal('detailsModal'); }, 2000);
             });
         });
+
+        function listenForAdminLogs() {
+            const container = document.getElementById('adminQueueContainer');
+            database.ref('pending_payments').on('value', (snapshot) => {
+                container.innerHTML = "";
+                const logs = snapshot.val();
+                if (!logs) {
+                    container.innerHTML = `<p style="font-size:13px; color:gray; text-align:center; margin-top:20px;">No pending payment logs found.</p>`;
+                    return;
+                }
+                Object.keys(logs).forEach(key => {
+                    const item = logs[key];
+                    const card = document.createElement('div');
+                    card.className = "card";
+                    card.style.flexDirection = "column";
+                    card.style.alignItems = "flex-start";
+                    card.style.gap = "8px";
+                    card.innerHTML = `
+                        <div style="width:100%;">
+                            <h4 style="margin:0; color:var(--primary); font-size:14px;">${item.username} (${item.price})</h4>
+                            <p style="margin:2px 0; font-size:11px; color:#aaa;">Wants: ${item.coinsRequested.toLocaleString()} Store Coins via ${item.method.toUpperCase()}</p>
+                        </div>
+                        <div style="display:flex; gap:10px; width:100%; margin-top:5px;">
+                            <button class="action-btn" style="background:#28a745; color:white; flex:1;" onclick="approvePayment('${item.logId}', '${item.userId}', ${item.coinsRequested})">Approve & Credit Store</button>
+                            <button class="action-btn" style="background:#dc3545; color:white; padding:4px 10px;" onclick="rejectPayment('${item.logId}')">X</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function approvePayment(logId, targetUserId, coinReward) {
+            // Credits shopBalance separately so store items remain clean
+            database.ref('tg_game_users/' + targetUserId + '/shopBalance').transaction((current) => {
+                return (current || 0) + coinReward;
+            }).then(() => {
+                database.ref('pending_payments/' + logId).remove();
+                showToast("Store Wallet Credited!");
+            });
+        }
+
+        function rejectPayment(logId) {
+            database.ref('pending_payments/' + logId).remove().then(() => {
+                showToast("Log Cleared.");
+            });
+        }
 
         function handleTask(platformId, URL, rewardAmt) {
             const btn = platformId === 'tg' ? document.getElementById('taskTgBtn') : document.getElementById('taskYtBtn');
@@ -681,10 +726,10 @@
                 btn.textContent = "Checking...";
                 btn.disabled = true;
                 setTimeout(() => {
-                    database.ref('tg_game_users/' + userId + '/balance').transaction((current) => { return (current || 0) + rewardAmt; });
+                    database.ref('tg_game_users/' + userId + '/tapBalance').transaction((curr) => (curr || 0) + rewardAmt);
                     btn.textContent = "Claimed ✓";
                     btn.style.backgroundColor = "#28a745";
-                    showToast(`+${rewardAmt.toLocaleString()} Coins Claimed!`);
+                    showToast(`+${rewardAmt.toLocaleString()} Tapped Coins Claimed!`);
                 }, 3000);
             }
         }
