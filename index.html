@@ -463,7 +463,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ⚠️ REMEMBER TO PUT YOUR RUNNING BOT INFO HERE:
+        // ⚠️ EDIT THESE THREE LINES WITH YOUR RELEVANT DETAILS FROM BOTFATHER & USERINFOBOT
         const BOT_USERNAME = "YOUR_ACTUAL_BOT_USERNAME_HERE"; 
         const ADMIN_CHAT_ID = "YOUR_NUMERIC_TELEGRAM_ID_HERE"; 
         const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
@@ -480,7 +480,6 @@
         var username = "Player";
         var userTgHandle = "";
 
-        // Core memory engine states updated live via Firebase synchronization directly
         let liveTapBalance = 0;
         let liveShopBalance = 0;
         let multitapLvl = 1;
@@ -519,7 +518,7 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
-            // LIVE APP SYNCHRONIZER REALTIME LISTENER (Loads saved values from Firebase perfectly)
+            // LIVE REALTIME LISTENER (Loads player balances safely whenever they reopen the app)
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -530,14 +529,12 @@
                     mLevelDisp.textContent = multitapLvl;
                     mCostDisp.textContent = multitapLvl * 100;
                 } else {
-                    // Initialize empty clean ledger profile
                     userRef.set({ tapBalance: 0, shopBalance: 0, multitapLvl: 1, name: username, handle: userTgHandle });
                 }
                 tapDisplay.textContent = liveTapBalance.toLocaleString();
                 shopDisplay.textContent = liveShopBalance.toLocaleString();
             });
 
-            // Energy restoration loop ticker
             setInterval(() => {
                 if (currentEnergy < maxEnergy) {
                     currentEnergy = Math.min(maxEnergy, currentEnergy + 1);
@@ -546,7 +543,7 @@
                 }
             }, 1500);
 
-            // COIN BUTTON TAP ACTION (Updates live variables and saves immediately to Firebase node)
+            // AUTO-SAVE TAP PROCESS
             document.getElementById('coinBtn').addEventListener('click', () => {
                 if (currentEnergy >= multitapLvl) {
                     currentEnergy -= multitapLvl;
@@ -556,7 +553,7 @@
                     energyFill.style.width = (currentEnergy / maxEnergy) * 100 + "%";
                     tapDisplay.textContent = liveTapBalance.toLocaleString();
                     
-                    // Direct Firebase writing keeps data saved if user instantly closes app
+                    // Saves instantly to cloud nodes so nothing resets on app close
                     userRef.update({ tapBalance: liveTapBalance });
                 }
             });
@@ -701,7 +698,6 @@
         }
 
         function approvePayment(logId, targetUserId, coinReward) {
-            // Credits shopBalance separately so store items remain clean
             database.ref('tg_game_users/' + targetUserId + '/shopBalance').transaction((current) => {
                 return (current || 0) + coinReward;
             }).then(() => {
