@@ -6,300 +6,246 @@
     <title>Bigger Coin Game</title>
     <style>
         body {
-            background-color: #121212;
+            margin: 0;
+            padding: 0;
+            background-color: #0b0c10;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 0;
-            padding: 20px;
-            user-select: none;
+            justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
             box-sizing: border-box;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #66fcf1;
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
         }
-        .score-container {
-            font-size: 2.5rem;
+
+        .balance-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(102, 252, 241, 0.1);
+        }
+
+        .balance-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #c5c6c7;
+        }
+
+        .balance-amount {
+            font-size: 42px;
             font-weight: bold;
-            color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-        .payout-rate {
-            font-size: 0.9rem;
-            color: #aaa;
+            color: #66fcf1;
             margin-top: 5px;
         }
-        .coin-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-grow: 1;
-            margin: 40px 0;
-        }
-        .coin {
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, #ffe066 0%, #f5b041 70%, #d35400 100%);
-            border-radius: 50%;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-            cursor: pointer;
-            transition: transform 0.05s ease;
-            border: 6px solid #fff;
-        }
-        .coin:active {
-            transform: scale(0.92);
-        }
-        .nav-tabs {
-            display: flex;
-            width: 100%;
-            max-width: 400px;
-            background-color: #1e1e1e;
-            border-radius: 12px;
-            padding: 5px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .tab-btn {
-            flex: 1;
+
+        .coin-button {
             background: none;
             border: none;
-            color: #888;
-            padding: 12px;
-            font-size: 1rem;
-            font-weight: bold;
+            outline: none;
             cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: transform 0.1s ease;
+            margin-bottom: 30px;
+            -webkit-tap-highlight-color: transparent;
         }
-        .tab-btn.active {
-            background-color: #ffd700;
-            color: #000;
+
+        .coin-button:active {
+            transform: scale(0.95);
         }
-        .panel {
-            display: none;
-            width: 100%;
-            max-width: 400px;
-            background-color: #1e1e1e;
-            border-radius: 16px;
-            padding: 20px;
-            box-sizing: border-box;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        .panel.active {
-            display: block;
-        }
-        .shop-item, .pay-item {
+
+        .coin-image {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, #f7b924 0%, #d4af37 60%, #aa7c11 100%);
+            border-radius: 50%;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background-color: #2b2b2b;
+            justify-content: center;
+            font-size: 70px;
+            box-shadow: 0 0 30px rgba(247, 185, 36, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.6);
+            border: 5px solid #fff;
+            user-select: none;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            text-align: left;
         }
-        .item-info h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
+
+        .feature-box h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #66fcf1;
         }
-        .item-info p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: #aaa;
+
+        .feature-box p {
+            font-size: 12px;
+            color: #a1a1a1;
+            margin: 0 0 10px 0;
         }
-        .buy-btn {
-            background-color: #ffd700;
-            color: #000;
+
+        .share-btn {
+            background-color: #66fcf1;
+            color: #0b0c10;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            width: 100%;
             transition: background 0.2s;
         }
-        .buy-btn:hover {
-            background-color: #f5b041;
+
+        .share-btn:hover {
+            background-color: #45a29e;
         }
-        .pay-instructions {
-            background-color: #252525;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            border-left: 4px solid #ffd700;
-            margin-top: 15px;
+
+        .withdraw-btn {
+            background-color: #222;
+            color: #666;
+            border: 1px solid #333;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: not-allowed;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
-        .crypto-address {
-            background-color: #111;
-            padding: 10px;
-            border-radius: 6px;
-            font-family: monospace;
-            word-break: break-all;
-            margin: 10px 0;
-            user-select: all;
-            border: 1px dashed #555;
+
+        .status-badge {
+            background-color: #ff4a4a;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            background: #45a29e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            z-index: 999;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="score-container">🪙 <span id="score">0</span></div>
-        <div class="payout-rate">Earning: +<span id="per-click">1</span>/tap | +<span id="per-second">0</span>/sec</div>
-    </div>
-
-    <!-- MAIN GAME TAB -->
-    <div id="game-panel" class="panel active">
-        <div class="coin-container">
-            <div class="coin" id="coinButton">⚡</div>
-        </div>
-    </div>
-
-    <!-- SHOP TAB -->
-    <div id="shop-panel" class="panel">
-        <div class="shop-item">
-            <div class="item-info">
-                <h4>Multi-Tap</h4>
-                <p>+1 Coin per click</p>
-                <p>Cost: <span id="multitap-cost">50</span> coins</p>
-            </div>
-            <button class="buy-btn" id="buy-multitap">Upgrade</button>
-        </div>
-        <div class="shop-item">
-            <div class="item-info">
-                <h4>Auto-Tap Bot</h4>
-                <p>+1 Coin every second</p>
-                <p>Cost: <span id="autotap-cost">100</span> coins</p>
-            </div>
-            <button class="buy-btn" id="buy-autotap">Hire</button>
-        </div>
-    </div>
-
-    <!-- BUY COINS (REAL MONEY) TAB -->
-    <div id="pay-panel" class="panel">
-        <h3>Buy Coins with Real Money</h3>
-        <p style="font-size: 0.9rem; color: #ccc;">Get a massive boost instantly by purchasing coin bundles!</p>
+    <div class="game-container">
+        <h1>Bigger Coin</h1>
         
-        <div class="pay-item">
-            <div class="item-info">
-                <h4>Starter Pack</h4>
-                <p>💎 10,000 Coins</p>
-                <p>Price: $1.00 / ₦1,500</p>
-            </div>
-            <button class="buy-btn" onclick="openPayment('Starter Pack ($1.00)')">Buy</button>
+        <!-- Balance UI -->
+        <div class="balance-container">
+            <div class="balance-label">Your Balance</div>
+            <div class="balance-amount" id="balance">0</div>
         </div>
 
-        <div class="pay-item">
-            <div class="item-info">
-                <h4>Whale Pack</h4>
-                <p>💎 100,000 Coins</p>
-                <p>Price: $7.50 / ₦10,000</p>
-            </div>
-            <button class="buy-btn" onclick="openPayment('Whale Pack ($7.50)')">Buy</button>
+        <!-- Interactive Coin Button -->
+        <button class="coin-button" id="coinBtn">
+            <div class="coin-image">🪙</div>
+        </button>
+
+        <!-- Referral Section -->
+        <div class="feature-box">
+            <h3>Invite Friends</h3>
+            <p>Get +500 coins for every friend who joins via your link!</p>
+            <button class="share-btn" id="copyRefBtn">Copy Referral Link</button>
         </div>
 
-        <div class="pay-instructions">
-            <strong>How to complete purchase:</strong><br>
-            1. Tap Buy on your package.<br>
-            2. Send payment or message management.<br>
-            3. Change the contact details in the code to your actual link or wallet!
+        <!-- Withdrawal Section -->
+        <div class="feature-box">
+            <h3>Withdrawal <span class="status-badge">Locked</span></h3>
+            <p>Coins cannot be withdrawn yet. Withdrawal functionality will automatically unlock as soon as Bigger Coin officially launches! Stay tuned.</p>
+            <button class="withdraw-btn" disabled>🔒 Locked Until Launch</button>
         </div>
     </div>
 
-    <div style="margin-top: auto; width: 100%; display: flex; justify-content: center;">
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('game-panel', this)">Tap</button>
-            <button class="tab-btn" onclick="switchTab('shop-panel', this)">Shop</button>
-            <button class="tab-btn" onclick="switchTab('pay-panel', this)">Buy Coins</button>
-        </div>
-    </div>
+    <div class="toast" id="toast">Link copied!</div>
 
     <script>
-        // Game State Variables
-        let score = 0;
-        let coinsPerClick = 1;
-        let coinsPerSecond = 0;
-        let multitapCost = 50;
-        let autotapCost = 100;
+        let balance = parseInt(localStorage.getItem('coin_balance')) || 0;
+        const balanceDisplay = document.getElementById('balance');
+        const coinBtn = document.getElementById('coinBtn');
 
-        // DOM Elements
-        const scoreDisplay = document.getElementById('score');
-        const perClickDisplay = document.getElementById('per-click');
-        const perSecondDisplay = document.getElementById('per-second');
-        const coinButton = document.getElementById('coinButton');
-        const buyMultitap = document.getElementById('buy-multitap');
-        const buyAutotap = document.getElementById('buy-autotap');
-        const multitapCostDisplay = document.getElementById('multitap-cost');
-        const autotapCostDisplay = document.getElementById('autotap-cost');
+        balanceDisplay.textContent = balance.toLocaleString();
 
-        // Navigation Tabs Engine
-        function switchTab(panelId, button) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(panelId).classList.add('active');
-            button.classList.add('active');
+        coinBtn.addEventListener('click', () => {
+            balance += 1; 
+            balanceDisplay.textContent = balance.toLocaleString();
+            localStorage.setItem('coin_balance', balance);
+        });
+
+        let userId = localStorage.getItem('game_user_id');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('game_user_id', userId);
         }
 
-        // Tap Mechanics
-        coinButton.addEventListener('click', () => {
-            score += coinsPerClick;
-            updateDisplay();
-        });
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrer = urlParams.get('ref');
+        const hasClaimedRef = localStorage.getItem('claimed_referral');
 
-        // Upgrade: Multi-tap
-        buyMultitap.addEventListener('click', () => {
-            if (score >= multitapCost) {
-                score -= multitapCost;
-                coinsPerClick += 1;
-                multitapCost = Math.round(multitapCost * 1.5);
-                updateDisplay();
-            } else {
-                alert("Not enough coins!");
-            }
-        });
-
-        // Upgrade: Auto-tap
-        buyAutotap.addEventListener('click', () => {
-            if (score >= autotapCost) {
-                score -= autotapCost;
-                coinsPerSecond += 1;
-                autotapCost = Math.round(autotapCost * 1.6);
-                updateDisplay();
-            } else {
-                alert("Not enough coins!");
-            }
-        });
-
-        // Game Loop (Auto Earnings)
-        setInterval(() => {
-            if (coinsPerSecond > 0) {
-                score += coinsPerSecond;
-                updateDisplay();
-            }
-        }, 1000);
-
-        // UI Update Function
-        function updateDisplay() {
-            scoreDisplay.textContent = score;
-            perClickDisplay.textContent = coinsPerClick;
-            perSecondDisplay.textContent = coinsPerSecond;
-            multitapCostDisplay.textContent = multitapCost;
-            autotapCostDisplay.textContent = autotapCost;
+        if (referrer && !hasClaimedRef) {
+            balance += 500; 
+            balanceDisplay.textContent = balance.toLocaleString();
+            localStorage.setItem('coin_balance', balance);
+            localStorage.setItem('claimed_referral', 'true');
+            showToast("Welcome! Received 500 bonus coins!");
         }
 
-        // Real Money Payment Action
-        function openPayment(packName) {
-            // Replace the URL below with your payment link, Telegram handle, or WhatsApp link
-            const contactURL = "https://t.me/your_telegram_username"; 
-            alert("Redirecting to purchase " + packName + ". Please send proof of payment to credit your account!");
-            window.open(contactURL, '_blank');
+        const copyRefBtn = document.getElementById('copyRefBtn');
+        copyRefBtn.addEventListener('click', () => {
+            const cleanUrl = window.location.href.split('?')[0];
+            const referralLink = `${cleanUrl}?ref=${userId}`;
+            
+            navigator.clipboard.writeText(referralLink).then(() => {
+                showToast("Referral link copied!");
+            }).catch(() => {
+                alert("Share this link: " + referralLink);
+            });
+        });
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2500);
         }
     </script>
 </body>
