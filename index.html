@@ -6,186 +6,357 @@
     <title>Bigger Coin Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --primary: #66fcf1;
+            --bg: #0b0c10;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-secondary: #c5c6c7;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #0b0c10;
+            background-color: var(--bg);
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
             overflow: hidden;
             user-select: none;
         }
 
-        .game-container {
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            box-sizing: border-box;
-            display: block;
-        }
-
-        /* Access Denied Shield for Regular Browsers */
+        /* Access Shield for Non-Telegram Browsers */
         #telegram-shield {
             display: none;
             text-align: center;
-            padding: 30px;
+            padding: 40px 20px;
+            margin-top: 20vh;
             max-width: 350px;
         }
 
-        .shield-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
+        /* App Container */
+        .game-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            position: relative;
+            padding-bottom: 80px; /* Space for bottom navigation bar */
+        }
+
+        /* Header Area */
+        .header {
+            text-align: center;
+            padding: 15px 10px 5px 10px;
         }
 
         h1 {
-            font-size: 26px;
-            margin-bottom: 10px;
-            color: #66fcf1;
-            text-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
         }
 
-        .balance-container {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(102, 252, 241, 0.1);
-        }
-
-        .balance-label {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #c5c6c7;
-        }
-
-        .balance-amount {
-            font-size: 46px;
+        /* Main Balance display */
+        .balance-box {
+            font-size: 42px;
             font-weight: bold;
-            color: #66fcf1;
-            margin-top: 5px;
+            color: #ffffff;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .coin-button {
+        /* Game Screen Views */
+        .screen {
+            display: none;
+            flex-content: 1;
+            padding: 15px;
+            overflow-y: auto;
+            height: calc(100vh - 180px);
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* TAP SCREEN ELEMENTS */
+        .coin-wrapper {
+            margin: auto 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .coin-btn {
             background: none;
             border: none;
             outline: none;
             cursor: pointer;
             transition: transform 0.05s ease;
-            margin-bottom: 30px;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .coin-button:active {
-            transform: scale(0.92);
+        .coin-btn:active {
+            transform: scale(0.94);
         }
 
-        .coin-image {
-            width: 190px;
-            height: 190px;
+        .coin-design {
+            width: 210px;
+            height: 210px;
             background: radial-gradient(circle, #f7b924 0%, #d4af37 60%, #aa7c11 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 75px;
-            box-shadow: 0 0 35px rgba(247, 185, 36, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.6);
-            border: 5px solid #fff;
+            font-size: 85px;
+            box-shadow: 0 0 40px rgba(247, 185, 36, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.5);
+            border: 6px solid #fff;
         }
 
-        .feature-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 15px;
-            text-align: left;
+        /* Energy System */
+        .energy-box {
+            width: 100%;
+            margin-top: auto;
+            padding: 10px 0;
         }
 
-        .feature-box h3 {
-            margin-top: 0;
+        .energy-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-secondary);
             margin-bottom: 5px;
+        }
+
+        .energy-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #222;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .energy-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #66fcf1, #45a29e);
+            transition: width 0.1s linear;
+        }
+
+        /* LIST & LIST ITEMS (Tasks, Upgrades, Refs) */
+        .list-container {
+            width: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .card-info h3 {
+            margin: 0 0 4px 0;
             font-size: 15px;
-            color: #66fcf1;
+            color: #fff;
         }
 
-        .feature-box p {
+        .card-info p {
+            margin: 0;
             font-size: 12px;
-            color: #a1a1a1;
-            margin: 0 0 10px 0;
+            color: var(--text-secondary);
         }
 
-        .share-btn {
-            background-color: #66fcf1;
+        .action-btn {
+            background-color: var(--primary);
             color: #0b0c10;
             border: none;
-            padding: 11px 20px;
+            padding: 8px 14px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
+            font-size: 12px;
             cursor: pointer;
-            width: 100%;
         }
 
-        .withdraw-btn {
-            background-color: #1a1a1a;
-            color: #555;
-            border: 1px solid #2d2d2d;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 8px;
+        .action-btn:disabled {
+            background-color: #333;
+            color: #666;
             cursor: not-allowed;
+        }
+
+        /* BOTTOM NAVIGATION BAR */
+        .nav-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
+            height: 70px;
+            background: #12131c;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            gap: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
         }
 
         .toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 90px;
             background: #45a29e;
             color: white;
-            padding: 10px 25px;
+            padding: 8px 20px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             display: none;
-            z-index: 999;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
 
-    <div class="game-container" id="mainGame">
-        <h1 id="welcomeUser">Bigger Coin</h1>
-        
-        <div class="balance-container">
-            <div class="balance-label">Total Balance</div>
-            <div class="balance-amount" id="balance">0</div>
+    <div class="game-container" id="appMain">
+        <div class="header">
+            <h1 id="userTitle">Bigger Coin</h1>
+            <div class="balance-box">🪙 <span id="balance">0</span></div>
         </div>
 
-        <button class="coin-button" id="coinBtn">
-            <div class="coin-image">🪙</div>
-        </button>
-
-        <div class="feature-box">
-            <h3>Invite Friends</h3>
-            <p>Get +500 coins instantly when a friend starts tapping via your link!</p>
-            <button class="share-btn" id="copyRefBtn">Copy Referral Link</button>
+        <div class="screen active" id="screen-tap">
+            <div class="coin-wrapper">
+                <button class="coin-btn" id="coinBtn">
+                    <div class="coin-design">🪙</div>
+                </button>
+            </div>
+            
+            <div class="energy-box">
+                <div class="energy-text">
+                    <span>⚡ Energy</span>
+                    <span><span id="energy">500</span>/<span id="maxEnergy">500</span></span>
+                </div>
+                <div class="energy-bar-bg">
+                    <div class="energy-bar-fill" id="energyFill"></div>
+                </div>
+            </div>
         </div>
 
-        <div class="feature-box">
-            <h3>Withdrawal</h3>
-            <button class="withdraw-btn" disabled>🔒 Locked Until Launch</button>
+        <div class="screen" id="screen-ref">
+            <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
+            <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
+                Share your link and earn +500 coins instantly for every friend that joins!
+            </p>
+            <button class="action-btn" id="copyRefBtn" style="width:100%; padding:12px; font-size:14px; margin-bottom:20px;">
+                🔗 Copy Referral Link
+            </button>
+            <div class="list-container" id="referralsList">
+                <div style="text-align:center; color:#555; margin-top:20px; font-size:13px;">No referrals yet. Invite friends to start tracking!</div>
+            </div>
         </div>
+
+        <div class="screen" id="screen-tasks">
+            <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
+            <div class="list-container">
+                <div class="card">
+                    <div class="card-info">
+                        <h3>Join Announcement Channel</h3>
+                        <p>+5,000 Coins</p>
+                    </div>
+                    <button class="action-btn" onclick="completeTask(this, 5000)">Join</button>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <h3>Follow X (Twitter) Account</h3>
+                        <p>+3,500 Coins</p>
+                    </div>
+                    <button class="action-btn" onclick="completeTask(this, 3500)">Follow</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-boost">
+            <h2 style="margin-top:0; color: var(--primary); width:100%;">Upgrades Shop</h2>
+            <div class="list-container">
+                <div class="card">
+                    <div class="card-info">
+                        <h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3>
+                        <p>Get +1 coin per tap. Cost: <span id="multitapCost">100</span> 🪙</p>
+                    </div>
+                    <button class="action-btn" id="buyMultitap">Upgrade</button>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <h3>Energy Tank (Lvl <span id="energyLvl">1</span>)</h3>
+                        <p>Add +500 capacity. Cost: <span id="energyCost">150</span> 🪙</p>
+                    </div>
+                    <button class="action-btn" id="buyEnergy">Upgrade</button>
+                </div>
+                <div class="card" style="opacity: 0.8;">
+                    <div class="card-info">
+                        <h3>Bigger Token Withdrawal</h3>
+                        <p>Status: Locked Until Launch</p>
+                    </div>
+                    <button class="action-btn" disabled style="background:#222; color:#555;">🔒 Soon</button>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-bar">
+            <button class="nav-item active" onclick="switchTab('tap')">
+                <div class="nav-icon">🪙</div><div>Tap</div>
+            </button>
+            <button class="nav-item" onclick="switchTab('ref')">
+                <div class="nav-icon">👥</div><div>Ref</div>
+            </button>
+            <button class="nav-item" onclick="switchTab('tasks')">
+                <div class="nav-icon">📋</div><div>Tasks</div>
+            </button>
+            <button class="nav-item" onclick="switchTab('boost')">
+                <div class="nav-icon">🚀</div><div>Boost</div>
+            </button>
+        </nav>
     </div>
 
     <div id="telegram-shield">
-        <div class="shield-icon">🤖</div>
-        <h2 style="color: #66fcf1;">Play inside Telegram</h2>
-        <p style="color: #c5c6c7; line-height: 1.5;">This game is optimized exclusively as a Telegram Mini App. Please open our official Bot link inside Telegram to start tapping and earning!</p>
+        <div style="font-size: 60px; margin-bottom: 15px;">🤖</div>
+        <h2>Play inside Telegram</h2>
+        <p style="color: var(--text-secondary); line-height: 1.5; font-size:14px;">
+            This game runs exclusively as a Telegram Mini App. Please launch the game through your official Telegram bot interface to start mining Bigger Coin!
+        </p>
     </div>
 
     <div class="toast" id="toast">Link Copied!</div>
@@ -194,85 +365,168 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Connect to Firebase Network Engine
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
-        // Initialize Telegram WebApp interface
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Make app full screen automatically
+        tg.expand();
 
         let userId = "";
         let username = "Player";
 
-        // TELEGRAM CHECK: If not in Telegram, block access completely like TapSwap
+        // GATEWAY: Verify client context is Telegram
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
-            document.getElementById('mainGame').style.display = 'none';
+            document.getElementById('appMain').style.display = 'none';
             document.getElementById('telegram-shield').style.display = 'block';
         } else {
-            // Read official live Telegram user profile parameters
             userId = "tg_" + tg.initDataUnsafe.user.id;
             username = tg.initDataUnsafe.user.first_name || "Player";
-            document.getElementById('welcomeUser').textContent = `👋 ${username}'s Coin`;
-            
-            runGameLogic();
+            document.getElementById('userTitle').textContent = `${username}'s Bigger Coin`;
+            initGameEngine();
         }
 
-        function runGameLogic() {
+        function initGameEngine() {
+            // Core Game Configuration Variables
             let balance = 0;
-            const balanceDisplay = document.getElementById('balance');
-            const coinBtn = document.getElementById('coinBtn');
+            let currentEnergy = 500;
+            let maxEnergy = 500;
+            let tapMultiplier = 1;
+            
+            let multitapLvl = 1;
+            let energyLvl = 1;
 
-            // Connect profile records instantly to the database cloud
-            const userRef = database.ref('tg_users/' + userId);
+            const userRef = database.ref('tg_game_users/' + userId);
+
+            // Interface References
+            const balanceDisplay = document.getElementById('balance');
+            const energyDisplay = document.getElementById('energy');
+            const maxEnergyDisplay = document.getElementById('maxEnergy');
+            const energyFill = document.getElementById('energyFill');
+
+            const mLevelDisp = document.getElementById('multitapLvl');
+            const mCostDisp = document.getElementById('multitapCost');
+            const eLevelDisp = document.getElementById('energyLvl');
+            const eCostDisp = document.getElementById('energyCost');
+
+            // Listen to data pipeline instantly
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     balance = data.balance || 0;
+                    multitapLvl = data.multitapLvl || 1;
+                    energyLvl = data.energyLvl || 1;
+                    maxEnergy = energyLvl * 500;
+                    tapMultiplier = multitapLvl;
+                    
+                    // Update shop metrics UI dynamically
+                    mLevelDisp.textContent = multitapLvl;
+                    mCostDisp.textContent = multitapLvl * 100;
+                    eLevelDisp.textContent = energyLvl;
+                    eCostDisp.textContent = energyLvl * 150;
+                    
+                    maxEnergyDisplay.textContent = maxEnergy;
                 } else {
-                    balance = 0;
-                    userRef.set({ balance: balance, name: username });
+                    userRef.set({ balance: 0, multitapLvl: 1, energyLvl: 1, name: username });
                 }
                 balanceDisplay.textContent = balance.toLocaleString();
             });
 
-            // Tap Mechanism
-            coinBtn.addEventListener('click', () => {
-                balance += 1;
-                balanceDisplay.textContent = balance.toLocaleString();
-                userRef.update({ balance: balance });
-            });
+            // Energy Bar Recharge Clock
+            setInterval(() => {
+                if (currentEnergy < maxEnergy) {
+                    currentEnergy = Math.min(maxEnergy, currentEnergy + 1);
+                    updateEnergyUI();
+                }
+            }, 1500);
 
-            // Automated Cross-Device Referral Reward System
-            const urlParams = new URLSearchParams(window.location.search);
-            const referrerId = urlParams.get('ref');
-            const hasClaimedRef = localStorage.getItem('tg_claimed_ref');
-
-            if (referrerId && referrerId !== userId && !hasClaimedRef) {
-                // Reward inviter through transaction
-                database.ref('tg_users/' + referrerId + '/balance').transaction((current) => {
-                    return (current || 0) + 500;
-                });
-                
-                // Drop 200 initial setup welcome coins to the new invitee
-                balance += 200;
-                userRef.update({ balance: balance });
-                localStorage.setItem('tg_claimed_ref', 'true');
-                showToast("Joined via link! +200 Welcome Bonus!");
+            function updateEnergyUI() {
+                energyDisplay.textContent = currentEnergy;
+                const percentage = (currentEnergy / maxEnergy) * 100;
+                energyFill.style.width = percentage + "%";
             }
 
-            // Copy Link Generation targeting the clean platform address
+            // Tapping Mechanism with Energy Checks
+            document.getElementById('coinBtn').addEventListener('click', () => {
+                if (currentEnergy >= tapMultiplier) {
+                    currentEnergy -= tapMultiplier;
+                    balance += tapMultiplier;
+                    
+                    updateEnergyUI();
+                    balanceDisplay.textContent = balance.toLocaleString();
+                    userRef.update({ balance: balance });
+                } else {
+                    tg.HapticFeedback.notificationOccurred('warning');
+                }
+            });
+
+            // UPGRADES IN SHOP
+            document.getElementById('buyMultitap').addEventListener('click', () => {
+                let cost = multitapLvl * 100;
+                if (balance >= cost) {
+                    balance -= cost;
+                    multitapLvl += 1;
+                    userRef.update({ balance: balance, multitapLvl: multitapLvl });
+                } else { alert("Not enough coins!"); }
+            });
+
+            document.getElementById('buyEnergy').addEventListener('click', () => {
+                let cost = energyLvl * 150;
+                if (balance >= cost) {
+                    balance -= cost;
+                    energyLvl += 1;
+                    userRef.update({ balance: balance, energyLvl: energyLvl });
+                } else { alert("Not enough coins!"); }
+            });
+
+            // REFERRAL TRACKING ENGINE
+            const urlParams = new URLSearchParams(window.location.search);
+            const referrerId = urlParams.get('ref');
+            const hasClaimedRef = localStorage.getItem('tg_bcoin_ref');
+
+            if (referrerId && referrerId !== userId && !hasClaimedRef) {
+                database.ref('tg_game_users/' + referrerId + '/balance').transaction((current) => {
+                    return (current || 0) + 500; 
+                });
+                balance += 200; // Gift welcome bonus
+                userRef.update({ balance: balance });
+                localStorage.setItem('tg_bcoin_ref', 'true');
+                showToast("Welcome bonus +200 coins added!");
+            }
+
+            // Copy Link Utility
             document.getElementById('copyRefBtn').addEventListener('click', () => {
                 const cleanUrl = window.location.href.split('?')[0];
                 const referralLink = `${cleanUrl}?ref=${userId}`;
-                
                 navigator.clipboard.writeText(referralLink).then(() => {
                     showToast("Referral Link Copied!");
-                }).catch(() => {
-                    alert("Share link: " + referralLink);
                 });
             });
+        }
+
+        // TAB NAVIGATION UTILITIES
+        function switchTab(tabId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById('screen-' + tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // TASK REWARD MECHANIC
+        function completeTask(btn, reward) {
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
+            setTimeout(() => {
+                const bDisplay = document.getElementById('balance');
+                let curBal = parseInt(bDisplay.textContent.replace(/,/g, '')) || 0;
+                curBal += reward;
+                bDisplay.textContent = curBal.toLocaleString();
+                
+                database.ref('tg_game_users/' + userId).update({ balance: curBal });
+                btn.textContent = "Claimed ✓";
+                showToast(`+${reward.toLocaleString()} task coins added!`);
+            }, 3000);
         }
 
         function showToast(message) {
