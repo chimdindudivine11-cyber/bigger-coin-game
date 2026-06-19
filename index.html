@@ -448,7 +448,7 @@
     <script>
         const BOT_USERNAME = "BiggerCoinGameBot"; 
 
-        // ⚠️ PASTE YOUR TELEGRAM BOT CREDENTIALS HERE TO RECEIVE NOTIFICATIONS DIRECTLY IN YOUR INBOX
+        // ⚠️ EDIT THESE TWO LINES WITH YOUR BOT TOKEN AND YOUR NUMERIC ID (Get ID from @userinfobot)
         const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
         const ADMIN_CHAT_ID = "YOUR_PERSONAL_TELEGRAM_NUMERIC_ID_HERE"; 
 
@@ -561,6 +561,7 @@
             document.getElementById('currencyModal').style.display = 'flex';
         }
 
+        // Clean element closing tool
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function clipText(textValue) {
@@ -611,24 +612,39 @@
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // ONE-DATA TELEGRAM INBOX DIRECT NOTIFIER PIPELINE
+        // ONE-DATA SECURE TELEGRAM DISPATCH PIPELINE WITH DATABASE BACKUP PROTECTION
         document.getElementById('btnConfirmPaid').addEventListener('click', () => {
             const confirmBtn = document.getElementById('btnConfirmPaid');
-            confirmBtn.textContent = "Sending Alert to Admin Inbox...";
+            confirmBtn.textContent = "Submitting Order Request...";
             confirmBtn.disabled = true;
 
             const finalPrice = (selectedPaymentType === 'paga') ? `₦${priceNgn.toLocaleString()}` : `$${priceUsd}.00`;
+            const timestamp = new Date().toISOString();
             
-            // Format precise markup notification layout for your inbox
+            // 1. Write the payment metadata into Firebase right away so you can see it in your database dashboard
+            const paymentLogData = {
+                userId: userId,
+                username: username,
+                coinsRequested: currentCoinReward,
+                price: finalPrice,
+                method: selectedPaymentType,
+                status: "pending",
+                time: timestamp
+            };
+
+            database.ref('pending_payments/' + userId + "_" + Date.now()).set(paymentLogData);
+
+            // 2. Format detailed text payload notification for your Telegram inbox
             const notificationMessage = `🔔 *New Payment Logged!*\n\n` +
-                                          `👤 *Player:* ${username} (${userId})\n` +
+                                          `👤 *Player:* ${username} (\`${userId}\`)\n` +
                                           `📦 *Package:* ${currentCoinReward.toLocaleString()} Coins\n` +
                                           `💰 *Price:* ${finalPrice}\n` +
                                           `💳 *Gateway:* ${selectedPaymentType.toUpperCase()}\n\n` +
-                                          `👉 *Action Required:* Verify your balance statement, then grant coins via Firebase for ${userId}`;
+                                          `👉 *Action Required:* Verify your account balance statements, then manually update balance in Firebase for user ID: \`${userId}\``;
 
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
+            // 3. Attempt to dispatch to Telegram Bot interface
             fetch(telegramUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -638,16 +654,20 @@
                     parse_mode: "Markdown"
                 })
             })
-            .then(() => {
-                confirmBtn.textContent = "Awaiting Admin Verification...";
-                showToast("Notification dispatched! Awaiting processing.");
-                setTimeout(() => { closeModal('detailsModal'); }, 2000);
+            .then(res => {
+                // Check if Telegram accepted the request or if it's using placeholder text
+                if (!res.ok) { throw new Error("Bot configuration placeholder detected"); }
+                
+                confirmBtn.textContent = "Awaiting Verification...";
+                showToast("Request sent! Awaiting admin processing.");
+                setTimeout(() => { closeModal('detailsModal'); }, 2500);
             })
             .catch(err => {
-                console.error(err);
-                alert("Network alert dispatch error.");
-                confirmBtn.textContent = "I Have Made Payment";
-                confirmBtn.disabled = false;
+                console.warn("Telegram Notification system caught error: ", err.message);
+                // SAFE RECOVERY FALLBACK: If bot fails/placeholders are active, still process gracefully via Firebase log
+                confirmBtn.textContent = "Awaiting Verification...";
+                showToast("Order logged under review! Awaiting verification.");
+                setTimeout(() => { closeModal('detailsModal'); }, 2500);
             });
         });
 
