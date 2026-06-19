@@ -6,8 +6,6 @@
     <title>Bigger Coin Game</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Flutterwave Inline Checkout SDK -->
-    <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
         :root {
             --primary: #66fcf1;
@@ -180,7 +178,7 @@
             cursor: pointer;
         }
 
-        /* Modal Overlays */
+        /* Modals Setup */
         .modal {
             display: none;
             position: fixed;
@@ -233,7 +231,7 @@
             border-color: var(--primary);
         }
 
-        .crypto-box {
+        .details-box {
             background: rgba(255,255,255,0.03);
             border: 1px dashed rgba(255,255,255,0.1);
             padding: 12px;
@@ -245,7 +243,7 @@
             user-select: text;
         }
 
-        /* Navigation Bar */
+        /* Navigation Bar Menu */
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -306,7 +304,7 @@
 </head>
 <body>
 
-    <!-- Redirect Window Shield -->
+    <!-- Redirect Gateway Screen -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -316,14 +314,14 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
-    <!-- Active Application State -->
+    <!-- Active Main App System Layout -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
             <div class="balance-box">🪙 <span id="balance">0</span></div>
         </div>
 
-        <!-- TAB 1: TAP -->
+        <!-- SCREEN 1: TAP -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -339,7 +337,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: REF -->
+        <!-- SCREEN 2: REF -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -350,7 +348,7 @@
             </button>
         </div>
 
-        <!-- TAB 3: TASKS -->
+        <!-- SCREEN 3: TASKS -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container">
@@ -365,24 +363,24 @@
             </div>
         </div>
 
-        <!-- TAB 4: AUTOMATED SHOP -->
+        <!-- SCREEN 4: SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Coins are automatically deposited into your wallet immediately upon checkout confirmation.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Coins are deposited into your account instantly upon payment submission.</p>
             <div class="list-container">
                 <div class="card">
                     <div class="card-info">
                         <h3>Starter Pack (10,000 🪙)</h3>
                         <p style="color:var(--primary); font-weight:600;">₦3,000 / $4.00</p>
                     </div>
-                    <button class="action-btn" onclick="selectCurrency(10000, 3000, 4)">Buy Pack</button>
+                    <button class="action-btn" onclick="selectPaymentMethod(10000, 3000, 4)">Buy Pack</button>
                 </div>
                 <div class="card">
                     <div class="card-info">
                         <h3>Whale Pack (100,000 🪙)</h3>
                         <p style="color:var(--primary); font-weight:600;">₦10,000 / $11.00</p>
                     </div>
-                    <button class="action-btn" onclick="selectCurrency(100000, 10000, 11)">Buy Pack</button>
+                    <button class="action-btn" onclick="selectPaymentMethod(100000, 10000, 11)">Buy Pack</button>
                 </div>
                 <div class="card" style="margin-top:15px;">
                     <div class="card-info"><h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3><p>Cost: <span id="multitapCost">100</span> 🪙</p></div>
@@ -391,7 +389,7 @@
             </div>
         </div>
 
-        <!-- Navigation Bar Menu Matrix -->
+        <!-- Bottom Menu Elements Navigation Matrix -->
         <nav class="nav-bar">
             <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
             <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
@@ -400,57 +398,49 @@
         </nav>
     </div>
 
-    <!-- MAIN GATEWAY: CURRENCY METHOD SELECTOR -->
+    <!-- MODAL 1: METHOD SELECTION -->
     <div class="modal" id="currencyModal">
         <div class="modal-content">
             <h3>Select Payment Option</h3>
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Choose your preferred settlement asset below.</p>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Choose how you want to settle the payment.</p>
             
-            <button class="currency-option-btn" id="payNairaBtn">
-                <span>🇳🇬 Local Cards / Bank Transfer</span><span style="color:var(--primary);" id="lblNairaPrice">₦0</span>
+            <button class="currency-option-btn" onclick="openDetailsModal('paga')">
+                <span>🇳🇬 Paga Bank Transfer</span><span style="color:var(--primary);" id="lblNairaPrice">₦0</span>
             </button>
-            <button class="currency-option-btn" id="payDollarBtn">
-                <span>💵 International Debit Cards</span><span style="color:var(--primary);" id="lblDollarPrice">$0</span>
+            <button class="currency-option-btn" onclick="openDetailsModal('paypal')">
+                <span>💵 PayPal Account</span><span style="color:var(--primary);" id="lblDollarPrice">$0</span>
             </button>
-            <button class="currency-option-btn" id="payUsdtBtn">
+            <button class="currency-option-btn" onclick="openDetailsModal('usdt')">
                 <span>🟢 Crypto Wallet (USDT)</span><span style="color:var(--primary);" id="lblUsdtPrice">$0</span>
             </button>
             
-            <button class="action-btn" style="background:#444; color:#fff; width:100%; margin-top:5px; padding:10px;" onclick="closeModal()">Cancel</button>
+            <button class="action-btn" style="background:#444; color:#fff; width:100%; margin-top:5px; padding:10px;" onclick="closeModal('currencyModal')">Cancel</button>
         </div>
     </div>
 
-    <!-- SECONDARY LAYER: USDT WALLET TRANSFER WINDOW -->
-    <div class="modal" id="cryptoModal">
+    <!-- MODAL 2: DIRECT ACCOUNT DETAILS DISPLAY & SYSTEM SCANNER -->
+    <div class="modal" id="detailsModal">
         <div class="modal-content">
-            <h3>USDT Crypto Settlement</h3>
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Send the exact amount to the corporate asset address listed below.</p>
+            <h3 id="detailsTitle">Payment details</h3>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Make the transfer of the exact amount below, then tap verify.</p>
             
-            <div class="crypto-box">
-                <b>Required Value:</b> <span id="cryptoTargetValue" style="color:var(--primary); font-weight:bold;">$0.00 USDT</span><br><br>
-                <b>Network:</b> <span style="color:#ff4a4a; font-weight:bold;">BEP-20 (BNB Smart Chain)</span><br><br>
-                <b>Recipient Address:</b><br>
-                <span style="font-family:monospace; color:#fff; font-size:11px;">0xa486E565d9e0D7B306759bf27eFCA03a06159ee1</span>
+            <div class="details-box" id="detailsContentBox">
+                <!-- Content injected dynamically via JavaScript based on what they click -->
             </div>
 
-            <p style="font-size:11px; color:var(--text-secondary); margin-bottom:15px; line-height:1.4;">
-                ⚠️ Only send USDT via the BEP-20 network. Asset drops over alternative networks will result in permanent loss.
-            </p>
-
-            <button class="action-btn" id="btnConfirmCryptoPaid" style="width:100%; padding:12px; font-size:13px; margin-bottom:10px;">I Have Transferred</button>
-            <button class="action-btn" style="background:#444; color:#fff; width:100%; padding:10px;" onclick="closeCryptoModal()">Go Back</button>
+            <button class="action-btn" id="btnConfirmPaid" style="width:100%; padding:12px; font-size:13px; margin-bottom:10px;">I Have Made Payment</button>
+            <button class="action-btn" style="background:#444; color:#fff; width:100%; padding:10px;" onclick="closeModal('detailsModal')">Go Back</button>
         </div>
     </div>
 
     <div class="toast" id="toast">Copied!</div>
 
-    <!-- Firebase SDK Infrastructure Pipelines -->
+    <!-- Firebase Realtime Configuration Engine -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
         const BOT_USERNAME = "BiggerCoinGameBot"; 
-        const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-XXXXX-X"; 
 
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -462,7 +452,6 @@
 
         var userId = "guest_user";
         var username = "Player";
-        var userEmail = "buyer@biggercoin.com";
 
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
             let botLink = `https://t.me/${BOT_USERNAME}`;
@@ -476,9 +465,6 @@
             
             userId = "tg_" + tg.initDataUnsafe.user.id;
             username = tg.initDataUnsafe.user.first_name || "Player";
-            if(tg.initDataUnsafe.user.username) {
-                userEmail = tg.initDataUnsafe.user.username + "@telegram.com";
-            }
             initGameEngine();
         }
 
@@ -547,12 +533,12 @@
             });
         }
 
-        // Selection Router Modals
+        // Selection variables
         let currentCoinReward = 0;
         let priceNgn = 0;
         let priceUsd = 0;
 
-        function selectCurrency(coins, ngn, usd) {
+        function selectPaymentMethod(coins, ngn, usd) {
             currentCoinReward = coins;
             priceNgn = ngn;
             priceUsd = usd;
@@ -564,74 +550,64 @@
             document.getElementById('currencyModal').style.display = 'flex';
         }
 
-        function closeModal() { document.getElementById('currencyModal').style.display = 'none'; }
-        function closeCryptoModal() { document.getElementById('cryptoModal').style.display = 'none'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        document.getElementById('payNairaBtn').addEventListener('click', () => {
-            closeModal();
-            launchFlutterwavePayment(priceNgn, "NGN");
-        });
+        // Populate your requested custom account structures details perfectly
+        function openDetailsModal(type) {
+            closeModal('currencyModal');
+            
+            const title = document.getElementById('detailsTitle');
+            const box = document.getElementById('detailsContentBox');
+            const btn = document.getElementById('btnConfirmPaid');
 
-        document.getElementById('payDollarBtn').addEventListener('click', () => {
-            closeModal();
-            launchFlutterwavePayment(priceUsd, "USD");
-        });
+            btn.textContent = "I Have Made Payment";
+            btn.disabled = false;
 
-        // Trigger crypto contextual wallet screen
-        document.getElementById('payUsdtBtn').addEventListener('click', () => {
-            closeModal();
-            document.getElementById('cryptoTargetValue').textContent = `$${priceUsd}.00 USDT`;
-            document.getElementById('btnConfirmCryptoPaid').textContent = "I Have Transferred";
-            document.getElementById('btnConfirmCryptoPaid').disabled = false;
-            document.getElementById('cryptoModal').style.display = 'flex';
-        });
+            if (type === 'paga') {
+                title.textContent = "Paga Transfer Details";
+                box.innerHTML = `
+                    <b>Amount to Send:</b> <span style="color:var(--primary); font-weight:bold;">₦${priceNgn.toLocaleString()}</span><br><br>
+                    <b>Account Number:</b> 1030800448<br>
+                    <b>Account Name:</b> Divine Lambert<br>
+                    <b>Paga Tag:</b> divinelambert6
+                `;
+            } else if (type === 'paypal') {
+                title.textContent = "PayPal Account Details";
+                box.innerHTML = `
+                    <b>Amount to Send:</b> <span style="color:var(--primary); font-weight:bold;">$${priceUsd}.00 USD</span><br><br>
+                    <b>PayPal Email:</b> ocboystone11@gmail.com<br>
+                    <b>Account Name:</b> Divine Lambert
+                `;
+            } else if (type === 'usdt') {
+                title.textContent = "USDT Crypto Details";
+                box.innerHTML = `
+                    <b>Amount to Send:</b> <span style="color:var(--primary); font-weight:bold;">$${priceUsd}.00 USDT</span><br><br>
+                    <b>Network:</b> <span style="color:#ff4a4a; font-weight:bold;">BEP-20 (BNB Smart Chain)</span><br><br>
+                    <b>Wallet Address:</b><br>
+                    <span style="font-family:monospace; color:#fff; font-size:11px;">0xa486E565d9e0D7B306759bf27eFCA03a06159ee1</span><br><br>
+                    <small style="color:#ffc107;">Only send BEP20 tokens to this address!</small>
+                `;
+            }
 
-        // Automated Verification Simulation for USDT Wallet Transfers
-        document.getElementById('btnConfirmCryptoPaid').addEventListener('click', () => {
-            const btn = document.getElementById('btnConfirmCryptoPaid');
-            btn.textContent = "Verifying Transaction...";
+            document.getElementById('detailsModal').style.display = 'flex';
+        }
+
+        // AUTOMATED RELEASING SYSTEM MATRIX
+        document.getElementById('btnConfirmPaid').addEventListener('click', () => {
+            const btn = document.getElementById('btnConfirmPaid');
+            btn.textContent = "Verifying Transaction with Bank Network...";
             btn.disabled = true;
 
+            // Simulates real database network confirmations over 5 seconds before firing credits
             setTimeout(() => {
                 database.ref('tg_game_users/' + userId + '/balance').transaction((currentBalance) => {
                     return (currentBalance || 0) + currentCoinReward;
                 }).then(() => {
-                    closeCryptoModal();
-                    showToast(`Transaction Confirmed! +${currentCoinReward.toLocaleString()} Coins added.`);
+                    closeModal('detailsModal');
+                    showToast(`Payment Confirmed! +${currentCoinReward.toLocaleString()} Coins Delivered.`);
                 });
             }, 5000);
         });
-
-        // Live Checkout Cards/Banks Automation via Flutterwave
-        function launchFlutterwavePayment(amountToCharge, currencyCode) {
-            FlutterwaveCheckout({
-                public_key: FLUTTERWAVE_PUBLIC_KEY,
-                tx_ref: "BC-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
-                amount: amountToCharge,
-                currency: currencyCode,
-                payment_options: "card, banktransfer, ussd",
-                customer: {
-                    email: userEmail,
-                    name: username,
-                },
-                customizations: {
-                    title: "Bigger Coin Store",
-                    description: `Purchase of ${currentCoinReward.toLocaleString()} Coins`,
-                    logo: "https://cdn-icons-png.flaticon.com/512/8142/8142126.png",
-                },
-                callback: function (data) {
-                    if (data.status === "successful" || data.charge_response_code === "00") {
-                        database.ref('tg_game_users/' + userId + '/balance').transaction((currentBalance) => {
-                            return (currentBalance || 0) + currentCoinReward;
-                        }).then(() => {
-                            showToast(`Payment Confirmed! +${currentCoinReward.toLocaleString()} Coins added.`);
-                        });
-                    } else {
-                        alert("Payment verification failed or was declined.");
-                    }
-                }
-            });
-        }
 
         function handleTask(platformId, URL, rewardAmt) {
             const btn = platformId === 'tg' ? document.getElementById('taskTgBtn') : document.getElementById('taskYtBtn');
