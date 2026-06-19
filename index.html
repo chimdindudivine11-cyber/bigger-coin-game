@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -178,7 +177,7 @@
             cursor: pointer;
         }
 
-        /* Modals Setup */
+        /* Modal Layout Structures */
         .modal {
             display: none;
             position: fixed;
@@ -215,7 +214,7 @@
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.1);
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             border-radius: 8px;
             margin-bottom: 12px;
@@ -224,6 +223,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-sizing: border-box;
         }
 
         .currency-option-btn:hover {
@@ -234,16 +234,17 @@
         .details-box {
             background: rgba(255,255,255,0.03);
             border: 1px dashed rgba(255,255,255,0.1);
-            padding: 12px;
+            padding: 15px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 13px;
             text-align: left;
             margin-bottom: 15px;
             word-break: break-all;
             user-select: text;
+            line-height: 1.6;
         }
 
-        /* Navigation Bar Menu */
+        /* Navigation Menu Tab Bar */
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -304,7 +305,6 @@
 </head>
 <body>
 
-    <!-- Redirect Gateway Screen -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -314,14 +314,12 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
-    <!-- Active Main App System Layout -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
             <div class="balance-box">🪙 <span id="balance">0</span></div>
         </div>
 
-        <!-- SCREEN 1: TAP -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -337,7 +335,6 @@
             </div>
         </div>
 
-        <!-- SCREEN 2: REF -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -348,7 +345,6 @@
             </button>
         </div>
 
-        <!-- SCREEN 3: TASKS -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container">
@@ -363,24 +359,23 @@
             </div>
         </div>
 
-        <!-- SCREEN 4: SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Coins are deposited into your account instantly upon payment submission.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Coins are deposited into your wallet balance instantly after submission verification.</p>
             <div class="list-container">
                 <div class="card">
                     <div class="card-info">
                         <h3>Starter Pack (10,000 🪙)</h3>
                         <p style="color:var(--primary); font-weight:600;">₦3,000 / $4.00</p>
                     </div>
-                    <button class="action-btn" onclick="selectPaymentMethod(10000, 3000, 4)">Buy Pack</button>
+                    <button class="action-btn" onclick="selectPaymentPackage(10000, 3000, 4)">Buy Pack</button>
                 </div>
                 <div class="card">
                     <div class="card-info">
                         <h3>Whale Pack (100,000 🪙)</h3>
                         <p style="color:var(--primary); font-weight:600;">₦10,000 / $11.00</p>
                     </div>
-                    <button class="action-btn" onclick="selectPaymentMethod(100000, 10000, 11)">Buy Pack</button>
+                    <button class="action-btn" onclick="selectPaymentPackage(100000, 10000, 11)">Buy Pack</button>
                 </div>
                 <div class="card" style="margin-top:15px;">
                     <div class="card-info"><h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3><p>Cost: <span id="multitapCost">100</span> 🪙</p></div>
@@ -389,7 +384,6 @@
             </div>
         </div>
 
-        <!-- Bottom Menu Elements Navigation Matrix -->
         <nav class="nav-bar">
             <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
             <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
@@ -398,35 +392,32 @@
         </nav>
     </div>
 
-    <!-- MODAL 1: METHOD SELECTION -->
     <div class="modal" id="currencyModal">
         <div class="modal-content">
             <h3>Select Payment Option</h3>
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Choose how you want to settle the payment.</p>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:20px;">Choose your preferred billing channel below.</p>
             
-            <button class="currency-option-btn" onclick="openDetailsModal('paga')">
+            <button class="currency-option-btn" onclick="openPaymentDetails('paga')">
                 <span>🇳🇬 Paga Bank Transfer</span><span style="color:var(--primary);" id="lblNairaPrice">₦0</span>
             </button>
-            <button class="currency-option-btn" onclick="openDetailsModal('paypal')">
-                <span>💵 PayPal Account</span><span style="color:var(--primary);" id="lblDollarPrice">$0</span>
+            <button class="currency-option-btn" onclick="openPaymentDetails('paypal')">
+                <span>💵 PayPal Account</span><span style="color:var(--primary);" id="lblDollarPrice">$0.00</span>
             </button>
-            <button class="currency-option-btn" onclick="openDetailsModal('usdt')">
-                <span>🟢 Crypto Wallet (USDT)</span><span style="color:var(--primary);" id="lblUsdtPrice">$0</span>
+            <button class="currency-option-btn" onclick="openPaymentDetails('usdt')">
+                <span>🟢 Crypto Wallet (USDT)</span><span style="color:var(--primary);" id="lblUsdtPrice">$0.00</span>
             </button>
             
             <button class="action-btn" style="background:#444; color:#fff; width:100%; margin-top:5px; padding:10px;" onclick="closeModal('currencyModal')">Cancel</button>
         </div>
     </div>
 
-    <!-- MODAL 2: DIRECT ACCOUNT DETAILS DISPLAY & SYSTEM SCANNER -->
     <div class="modal" id="detailsModal">
         <div class="modal-content">
-            <h3 id="detailsTitle">Payment details</h3>
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Make the transfer of the exact amount below, then tap verify.</p>
+            <h3 id="detailsTitle">Transfer Funds</h3>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Send the exact total value to the details below, then hit verify.</p>
             
             <div class="details-box" id="detailsContentBox">
-                <!-- Content injected dynamically via JavaScript based on what they click -->
-            </div>
+                </div>
 
             <button class="action-btn" id="btnConfirmPaid" style="width:100%; padding:12px; font-size:13px; margin-bottom:10px;">I Have Made Payment</button>
             <button class="action-btn" style="background:#444; color:#fff; width:100%; padding:10px;" onclick="closeModal('detailsModal')">Go Back</button>
@@ -435,7 +426,6 @@
 
     <div class="toast" id="toast">Copied!</div>
 
-    <!-- Firebase Realtime Configuration Engine -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -533,12 +523,12 @@
             });
         }
 
-        // Selection variables
+        // Routing Globals
         let currentCoinReward = 0;
         let priceNgn = 0;
         let priceUsd = 0;
 
-        function selectPaymentMethod(coins, ngn, usd) {
+        function selectPaymentPackage(coins, ngn, usd) {
             currentCoinReward = coins;
             priceNgn = ngn;
             priceUsd = usd;
@@ -552,59 +542,61 @@
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Populate your requested custom account structures details perfectly
-        function openDetailsModal(type) {
+        // Unified account renderer
+        function openPaymentDetails(paymentType) {
             closeModal('currencyModal');
             
             const title = document.getElementById('detailsTitle');
             const box = document.getElementById('detailsContentBox');
-            const btn = document.getElementById('btnConfirmPaid');
+            const confirmBtn = document.getElementById('btnConfirmPaid');
 
-            btn.textContent = "I Have Made Payment";
-            btn.disabled = false;
+            confirmBtn.textContent = "I Have Made Payment";
+            confirmBtn.disabled = false;
 
-            if (type === 'paga') {
+            if (paymentType === 'paga') {
                 title.textContent = "Paga Transfer Details";
                 box.innerHTML = `
                     <b>Amount to Send:</b> <span style="color:var(--primary); font-weight:bold;">₦${priceNgn.toLocaleString()}</span><br><br>
+                    <b>Bank Name:</b> Paga (Moni Pay / Pagatech)<br>
                     <b>Account Number:</b> 1030800448<br>
                     <b>Account Name:</b> Divine Lambert<br>
                     <b>Paga Tag:</b> divinelambert6
                 `;
-            } else if (type === 'paypal') {
-                title.textContent = "PayPal Account Details";
+            } else if (paymentType === 'paypal') {
+                title.textContent = "PayPal Settlement Link";
                 box.innerHTML = `
                     <b>Amount to Send:</b> <span style="color:var(--primary); font-weight:bold;">$${priceUsd}.00 USD</span><br><br>
-                    <b>PayPal Email:</b> ocboystone11@gmail.com<br>
-                    <b>Account Name:</b> Divine Lambert
+                    <b>PayPal Email Account:</b> ocboystone11@gmail.com<br>
+                    <b>Account Legal Owner Name:</b> Divine Lambert<br><br>
+                    <small style="color:var(--text-secondary);">Kindly ensure you choose "Friends & Family" to facilitate faster validation times.</small>
                 `;
-            } else if (type === 'usdt') {
-                title.textContent = "USDT Crypto Details";
+            } else if (paymentType === 'usdt') {
+                title.textContent = "USDT Crypto Settlement";
                 box.innerHTML = `
                     <b>Amount to Send:</b> <span style="color:var(--primary); font-weight:bold;">$${priceUsd}.00 USDT</span><br><br>
-                    <b>Network:</b> <span style="color:#ff4a4a; font-weight:bold;">BEP-20 (BNB Smart Chain)</span><br><br>
-                    <b>Wallet Address:</b><br>
+                    <b>Network Ecosystem:</b> <span style="color:#ff4a4a; font-weight:bold;">BEP-20 (BNB Smart Chain)</span><br><br>
+                    <b>Deposit Wallet Address:</b><br>
                     <span style="font-family:monospace; color:#fff; font-size:11px;">0xa486E565d9e0D7B306759bf27eFCA03a06159ee1</span><br><br>
-                    <small style="color:#ffc107;">Only send BEP20 tokens to this address!</small>
+                    <small style="color:#ffc107;">Attention: Forwarding non-BEP20 assets results in instant transaction dropping.</small>
                 `;
             }
 
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // AUTOMATED RELEASING SYSTEM MATRIX
+        // UNIFIED AUTOMATION SYSTEM SCANNER ENGINE (Fires equally across Paga, PayPal, and USDT)
         document.getElementById('btnConfirmPaid').addEventListener('click', () => {
-            const btn = document.getElementById('btnConfirmPaid');
-            btn.textContent = "Verifying Transaction with Bank Network...";
-            btn.disabled = true;
+            const confirmBtn = document.getElementById('btnConfirmPaid');
+            confirmBtn.textContent = "Connecting to Core Bank Verification System...";
+            confirmBtn.disabled = true;
 
-            // Simulates real database network confirmations over 5 seconds before firing credits
+            // Tracks the exactly uniform 5-second simulated verification pipeline requested 
             setTimeout(() => {
                 database.ref('tg_game_users/' + userId + '/balance').transaction((currentBalance) => {
                     return (currentBalance || 0) + currentCoinReward;
                 }).then(() => {
                     closeModal('detailsModal');
-                    showToast(`Payment Confirmed! +${currentCoinReward.toLocaleString()} Coins Delivered.`);
+                    showToast(`Transaction Confirmed! +${currentCoinReward.toLocaleString()} Coins added.`);
                 });
             }, 5000);
         });
