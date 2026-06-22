@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Flutterwave Inline Payment SDK -->
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
         :root {
@@ -255,6 +257,7 @@
 </head>
 <body>
 
+    <!-- Redirect Launch Shield -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -264,6 +267,7 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
+    <!-- Active Interface Layout Structure -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
@@ -279,6 +283,7 @@
             </div>
         </div>
 
+        <!-- TAB 1: CLICKER GAME -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -294,6 +299,7 @@
             </div>
         </div>
 
+        <!-- TAB 2: REF LINK -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -304,6 +310,7 @@
             </button>
         </div>
 
+        <!-- TAB 3: TASKS SYSTEM -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container" style="width:100%;">
@@ -318,6 +325,7 @@
             </div>
         </div>
 
+        <!-- TAB 4: AUTOMATED FLUTTERWAVE SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Gems are credited immediately to your balance upon checkout verification.</p>
@@ -343,6 +351,7 @@
             </div>
         </div>
         
+        <!-- System Footer Menu Options -->
         <nav class="nav-bar">
             <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
             <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
@@ -353,11 +362,12 @@
 
     <div class="toast" id="toast">Copied!</div>
 
+    <!-- Firebase SDK Operations Modules -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ⚠️ EDIT THIS LINE WITH YOUR BOT USERNAME IF NEEDED
+        // ⚠️ REMEMBER TO CHOOSE YOUR EXACT TELEGRAM BOT USERNAME HERE (without the @ symbol)
         const BOT_USERNAME = "YOUR_ACTUAL_BOT_USERNAME_HERE"; 
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
 
@@ -367,24 +377,29 @@
 
         const tg = window.Telegram.WebApp;
         const urlParams = new URLSearchParams(window.location.search);
-        const referrerId = urlParams.get('ref');
+        
+        // Target tracking clean data setup
+        let rawRefData = urlParams.get('tgWebAppStartParam') || urlParams.get('ref') || "";
+        let referrerId = rawRefData.replace("tgRef_", ""); 
 
         var userId = "guest_user";
         var username = "Player";
         var userTgHandle = "";
 
-        // Local tracking variables to prevent zero balance drops
         let liveTapBalance = parseInt(localStorage.getItem('bcoin_backup_tap')) || 0;
         let liveShopBalance = parseInt(localStorage.getItem('bcoin_backup_shop')) || 0;
         let multitapLvl = parseInt(localStorage.getItem('bcoin_backup_level')) || 1;
         let currentEnergy = 500;
         let maxEnergy = 500;
 
+        // VERIFY ENVIRONMENT: If opened outside Telegram, force route to your bot link setup immediately!
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
-            let botLink = `https://t.me/${BOT_USERNAME}`;
-            if (referrerId) botLink += `?start=${referrerId}`;
-            document.getElementById('manualRedirectBtn').onclick = () => { window.location.href = botLink; };
-            window.location.href = botLink;
+            let directBotLink = `https://t.me/${BOT_USERNAME}/app`;
+            if (referrerId) {
+                directBotLink = `https://t.me/${BOT_USERNAME}?start=tgRef_${referrerId}`;
+            }
+            document.getElementById('manualRedirectBtn').onclick = () => { window.location.href = directBotLink; };
+            window.location.href = directBotLink;
         } else {
             document.getElementById('redirect-screen').style.display = 'none';
             document.getElementById('appMain').style.display = 'flex';
@@ -470,8 +485,10 @@
                 } else { alert("Not enough Tapped Coins!"); }
             });
 
-            if (referrerId && referrerId !== userId && !localStorage.getItem('tg_bcoin_ref')) {
-                database.ref('tg_game_users/' + referrerId + '/tapBalance').transaction((curr) => (curr || 0) + 500);
+            // Clean, updated referral tracking trigger
+            let internalCleanUserId = userId.replace("tg_", "");
+            if (referrerId && referrerId !== internalCleanUserId && !localStorage.getItem('tg_bcoin_ref')) {
+                database.ref('tg_game_users/tg_' + referrerId + '/tapBalance').transaction((curr) => (curr || 0) + 500);
                 liveTapBalance += 200;
                 localStorage.setItem('bcoin_backup_tap', liveTapBalance);
                 userRef.update({ tapBalance: liveTapBalance });
@@ -479,12 +496,12 @@
             }
 
             document.getElementById('copyRefBtn').addEventListener('click', () => {
-                const referralLink = `https://t.me/${BOT_USERNAME}?start=${tg.initDataUnsafe.user.id}`;
+                let cleanId = userId.replace("tg_", "");
+                const referralLink = `https://t.me/${BOT_USERNAME}?start=tgRef_${cleanId}`;
                 navigator.clipboard.writeText(referralLink).then(() => { showToast("Referral Link Copied!"); });
             });
         }
 
-        // FULL FIXED FLUTTERWAVE CONTROLLER - FORCES CARD, DIRECT BANK TRANSFERS, AND USSD OPTIONS
         function payWithFlutterwave(coinReward, priceNgn, packageName) {
             FlutterwaveCheckout({
                 public_key: FLUTTERWAVE_PUBLIC_KEY,
@@ -519,7 +536,6 @@
             });
         }
 
-        // IMMEDIATE LOCAL + CLOUD TASK SYNC HANDLER
         function handleTask(platformId, URL, rewardAmt) {
             const btn = platformId === 'tg' ? document.getElementById('taskTgBtn') : document.getElementById('taskYtBtn');
             const taskCacheKey = `task_done_${platformId}_${userId}`;
