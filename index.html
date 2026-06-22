@@ -367,7 +367,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ⚠️ REMEMBER TO CHOOSE YOUR EXACT TELEGRAM BOT USERNAME HERE (without the @ symbol)
+        // ⚠️ CHANGE THIS VALUE BELOW TO YOUR REAL BOT USERNAME (Example: "BiggerCoinBot")
         const BOT_USERNAME = "YOUR_ACTUAL_BOT_USERNAME_HERE"; 
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
 
@@ -378,7 +378,6 @@
         const tg = window.Telegram.WebApp;
         const urlParams = new URLSearchParams(window.location.search);
         
-        // Target tracking clean data setup
         let rawRefData = urlParams.get('tgWebAppStartParam') || urlParams.get('ref') || "";
         let referrerId = rawRefData.replace("tgRef_", ""); 
 
@@ -392,7 +391,6 @@
         let currentEnergy = 500;
         let maxEnergy = 500;
 
-        // VERIFY ENVIRONMENT: If opened outside Telegram, force route to your bot link setup immediately!
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
             let directBotLink = `https://t.me/${BOT_USERNAME}/app`;
             if (referrerId) {
@@ -485,7 +483,6 @@
                 } else { alert("Not enough Tapped Coins!"); }
             });
 
-            // Clean, updated referral tracking trigger
             let internalCleanUserId = userId.replace("tg_", "");
             if (referrerId && referrerId !== internalCleanUserId && !localStorage.getItem('tg_bcoin_ref')) {
                 database.ref('tg_game_users/tg_' + referrerId + '/tapBalance').transaction((curr) => (curr || 0) + 500);
