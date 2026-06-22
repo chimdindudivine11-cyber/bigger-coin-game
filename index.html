@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
         :root {
             --primary: #66fcf1;
@@ -195,85 +195,6 @@
             cursor: pointer;
         }
 
-        /* Modals Setup */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #12131c;
-            border: 1px solid var(--primary);
-            border-radius: 16px;
-            padding: 20px;
-            width: 90%;
-            max-width: 340px;
-            box-sizing: border-box;
-            text-align: center;
-        }
-
-        .modal h3 {
-            margin-top: 0;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .currency-option-btn {
-            width: 100%;
-            padding: 14px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
-        .currency-option-btn:hover {
-            background: rgba(102, 252, 241, 0.15);
-            border-color: var(--primary);
-        }
-
-        .details-box {
-            background: rgba(255,255,255,0.03);
-            border: 1px dashed rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 13px;
-            text-align: left;
-            margin-bottom: 15px;
-            word-break: break-all;
-            user-select: text;
-            line-height: 1.6;
-        }
-
-        .copyable-field {
-            background: rgba(102, 252, 241, 0.08);
-            border: 1px solid rgba(102, 252, 241, 0.2);
-            padding: 4px 8px;
-            border-radius: 4px;
-            color: var(--primary);
-            cursor: pointer;
-            display: inline-block;
-            margin: 2px 0;
-            font-weight: 500;
-        }
-
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -334,7 +255,6 @@
 </head>
 <body>
 
-    <!-- Redirect Launch Shield -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -344,7 +264,6 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
-    <!-- Active Interface Layout Structure -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
@@ -360,7 +279,6 @@
             </div>
         </div>
 
-        <!-- TAB 1: CLICKER GAME -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -376,7 +294,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: REF LINK -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -387,7 +304,6 @@
             </button>
         </div>
 
-        <!-- TAB 3: TASKS SYSTEM -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container" style="width:100%;">
@@ -402,24 +318,23 @@
             </div>
         </div>
 
-        <!-- TAB 4: MARKETPLACE SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Purchased coins are safely deposited into your Store Balance after verification.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Gems are credited immediately to your balance upon checkout verification.</p>
             <div class="list-container" style="width:100%;">
                 <div class="card">
                     <div class="card-info">
                         <h3>Starter Pack (10,000 💎)</h3>
-                        <p style="color:var(--primary); font-weight:600;">₦3,000 / $4.00</p>
+                        <p style="color:var(--primary); font-weight:600;">₦3,000</p>
                     </div>
-                    <button class="action-btn" onclick="selectPaymentPackage(10000, 3000, 4)">Buy Pack</button>
+                    <button class="action-btn" onclick="payWithFlutterwave(10000, 3000, 'Starter Pack')">Buy Pack</button>
                 </div>
                 <div class="card">
                     <div class="card-info">
                         <h3>Whale Pack (100,000 💎)</h3>
-                        <p style="color:var(--primary); font-weight:600;">₦10,000 / $11.00</p>
+                        <p style="color:var(--primary); font-weight:600;">₦10,000</p>
                     </div>
-                    <button class="action-btn" onclick="selectPaymentPackage(100000, 10000, 11)">Buy Pack</button>
+                    <button class="action-btn" onclick="payWithFlutterwave(100000, 10000, 'Whale Pack')">Buy Pack</button>
                 </div>
                 <div class="card" style="margin-top:15px;">
                     <div class="card-info"><h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3><p>Cost: <span id="multitapCost">100</span> Tapped Coins</p></div>
@@ -427,57 +342,24 @@
                 </div>
             </div>
         </div>
-
-        <!-- TAB 5: SECRET ADMIN PANEL -->
-        <div class="screen" id="screen-admin">
-            <h2 style="margin-top:0; color: #ff4a4a; width:100%;">Admin Approval Desk</h2>
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:15px; width:100%;">Review ledger logs and approve store coin issuance below.</p>
-            <div id="adminQueueContainer" style="width:100%;">
-                <p style="font-size:13px; color:gray; text-align:center; margin-top:20px;">No pending payment logs found.</p>
-            </div>
-        </div>
-
-        <!-- System Footer Menu Options -->
+        
         <nav class="nav-bar">
             <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
             <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
             <button class="nav-item" onclick="switchTab('tasks')"><div class="nav-icon">📋</div><div>Tasks</div></button>
             <button class="nav-item" onclick="switchTab('boost')"><div class="nav-icon">🚀</div><div>Store</div></button>
-            <button class="nav-item" id="navAdminBtn" style="display:none;" onclick="switchTab('admin')"><div class="nav-icon">🛠️</div><div>Admin</div></button>
         </nav>
-    </div>
-
-    <!-- MODAL POPUPS LAYERS -->
-    <div class="modal" id="currencyModal">
-        <div class="modal-content">
-            <h3>Select Payment Option</h3>
-            <button class="currency-option-btn" onclick="openPaymentDetails('paga')"><span>🇳🇬 Paga Bank Transfer</span><span style="color:var(--primary);" id="lblNairaPrice">₦0</span></button>
-            <button class="currency-option-btn" onclick="openPaymentDetails('paypal')"><span>💵 PayPal Account</span><span style="color:var(--primary);" id="lblDollarPrice">$0.00</span></button>
-            <button class="currency-option-btn" onclick="openPaymentDetails('usdt')"><span>🟢 Crypto Wallet (USDT)</span><span style="color:var(--primary);" id="lblUsdtPrice">$0.00</span></button>
-            <button class="action-btn" style="background:#444; color:#fff; width:100%; margin-top:5px; padding:10px;" onclick="closeModal('currencyModal')">Cancel</button>
-        </div>
-    </div>
-
-    <div class="modal" id="detailsModal">
-        <div class="modal-content">
-            <h3 id="detailsTitle">Transfer Funds</h3>
-            <div class="details-box" id="detailsContentBox"></div>
-            <button class="action-btn" id="btnConfirmPaid" style="width:100%; padding:12px; font-size:13px; margin-bottom:10px;">I Have Made Payment</button>
-            <button class="action-btn" style="background:#444; color:#fff; width:100%; padding:10px;" onclick="closeModal('detailsModal')">Go Back</button>
-        </div>
     </div>
 
     <div class="toast" id="toast">Copied!</div>
 
-    <!-- Firebase SDK Operations Modules -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ⚠️ REMEMBER TO PUT YOUR RUNNING BOT INFO HERE:
+        // ⚠️ REMEMBER TO REPLACE THESE WITH YOUR BOT TOKENS
         const BOT_USERNAME = "YOUR_ACTUAL_BOT_USERNAME_HERE"; 
-        const ADMIN_CHAT_ID = "YOUR_NUMERIC_TELEGRAM_ID_HERE"; 
-        const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
+        const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
 
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -491,7 +373,7 @@
         var username = "Player";
         var userTgHandle = "";
 
-        // Core balances fallback directly onto phone internal storage immediately
+        // Core local persistent cache layout
         let liveTapBalance = parseInt(localStorage.getItem('bcoin_backup_tap')) || 0;
         let liveShopBalance = parseInt(localStorage.getItem('bcoin_backup_shop')) || 0;
         let multitapLvl = parseInt(localStorage.getItem('bcoin_backup_level')) || 1;
@@ -512,11 +394,6 @@
             username = tg.initDataUnsafe.user.first_name || "Player";
             userTgHandle = tg.initDataUnsafe.user.username || "";
             
-            if (tg.initDataUnsafe.user.id.toString() === ADMIN_CHAT_ID.trim()) {
-                document.getElementById('navAdminBtn').style.display = 'flex';
-                listenForAdminLogs();
-            }
-            
             initGameEngine();
         }
 
@@ -530,17 +407,15 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
-            // Set visual balances to phone memory right away so they never see "0"
+            // Render local balances instantly so they never see a 0 reset drop
             tapDisplay.textContent = liveTapBalance.toLocaleString();
             shopDisplay.textContent = liveShopBalance.toLocaleString();
             mLevelDisp.textContent = multitapLvl;
             mCostDisp.textContent = multitapLvl * 100;
 
-            // Load Firebase securely, but prevent overriding if data is blank/bugged
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    // Only accept database value if it is higher or equal to local memory
                     if ((data.tapBalance || 0) >= liveTapBalance) {
                         liveTapBalance = data.tapBalance || 0;
                         localStorage.setItem('bcoin_backup_tap', liveTapBalance);
@@ -557,7 +432,6 @@
                     mLevelDisp.textContent = multitapLvl;
                     mCostDisp.textContent = multitapLvl * 100;
                 } else {
-                    // Initialize if completely blank profile
                     userRef.set({ tapBalance: liveTapBalance, shopBalance: liveShopBalance, multitapLvl: multitapLvl, name: username, handle: userTgHandle });
                 }
                 tapDisplay.textContent = liveTapBalance.toLocaleString();
@@ -572,7 +446,6 @@
                 }
             }, 1500);
 
-            // Double security tap engine (Saves to both Cloud Database AND Local Phone Cache)
             document.getElementById('coinBtn').addEventListener('click', () => {
                 if (currentEnergy >= multitapLvl) {
                     currentEnergy -= multitapLvl;
@@ -582,7 +455,6 @@
                     energyFill.style.width = (currentEnergy / maxEnergy) * 100 + "%";
                     tapDisplay.textContent = liveTapBalance.toLocaleString();
                     
-                    // Permanent immediate backup triggers
                     localStorage.setItem('bcoin_backup_tap', liveTapBalance);
                     userRef.update({ tapBalance: liveTapBalance });
                 }
@@ -613,140 +485,53 @@
             });
         }
 
-        let currentCoinReward = 0, priceNgn = 0, priceUsd = 0, selectedPaymentType = "";
-
-        function selectPaymentPackage(coins, ngn, usd) {
-            currentCoinReward = coins; priceNgn = ngn; priceUsd = usd;
-            document.getElementById('lblNairaPrice').textContent = `₦${ngn.toLocaleString()}`;
-            document.getElementById('lblDollarPrice').textContent = `$${usd}.00`;
-            document.getElementById('lblUsdtPrice').textContent = `$${usd}.00`;
-            document.getElementById('currencyModal').style.display = 'flex';
-        }
-
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function clipText(textValue) { navigator.clipboard.writeText(textValue).then(() => { showToast("Copied!"); }); }
-
-        function openPaymentDetails(paymentType) {
-            closeModal('currencyModal');
-            selectedPaymentType = paymentType;
-            const title = document.getElementById('detailsTitle');
-            const box = document.getElementById('detailsContentBox');
-            const confirmBtn = document.getElementById('btnConfirmPaid');
-
-            confirmBtn.textContent = "I Have Made Payment";
-            confirmBtn.disabled = false;
-
-            if (paymentType === 'paga') {
-                title.textContent = "Paga Transfer Details";
-                box.innerHTML = `
-                    <b>Amount:</b> <span class="copyable-field" onclick="clipText('${priceNgn}')">₦${priceNgn.toLocaleString()}</span><br>
-                    <b>Bank:</b> Paga (Moni Pay)<br>
-                    <b>Account Number:</b> <span class="copyable-field" onclick="clipText('1030800448')">1030800448 📋</span><br>
-                    <b>Account Name:</b> Divine Lambert<br>
-                    <b>Paga Tag:</b> <span class="copyable-field" onclick="clipText('divinelambert6')">divinelambert6 📋</span>
-                `;
-            } else if (paymentType === 'paypal') {
-                title.textContent = "PayPal Settlement Link";
-                box.innerHTML = `
-                    <b>Amount:</b> <span class="copyable-field" onclick="clipText('${priceUsd}')">$${priceUsd}.00 USD</span><br>
-                    <b>PayPal Email:</b> <span class="copyable-field" onclick="clipText('ocboystone11@gmail.com')">ocboystone11@gmail.com 📋</span><br>
-                    <b>Account Holder:</b> Divine Lambert
-                `;
-            } else if (paymentType === 'usdt') {
-                title.textContent = "USDT Crypto Settlement";
-                box.innerHTML = `
-                    <b>Amount:</b> <span class="copyable-field" onclick="clipText('${priceUsd}')">$${priceUsd}.00 USDT</span><br>
-                    <b>Network:</b> <span style="color:#ff4a4a; font-weight:bold;">BEP-20 (BNB Smart Chain)</span><br>
-                    <b>Wallet Address:</b><br>
-                    <span class="copyable-field" style="font-family:monospace; font-size:11px;" onclick="clipText('0xa486E565d9e0D7B306759bf27eFCA03a06159ee1')">0xa486E565d9e0D7B306759bf27eFCA03a06159ee1 📋</span>
-                `;
-            }
-            document.getElementById('detailsModal').style.display = 'flex';
-        }
-
-        document.getElementById('btnConfirmPaid').addEventListener('click', () => {
-            const confirmBtn = document.getElementById('btnConfirmPaid');
-            confirmBtn.textContent = "Submitting Order Request...";
-            confirmBtn.disabled = true;
-
-            const finalPrice = (selectedPaymentType === 'paga') ? `₦${priceNgn.toLocaleString()}` : `$${priceUsd}.00`;
-            const logId = userId + "_" + Date.now();
-            
-            const paymentLogData = {
-                logId: logId,
-                userId: userId,
-                username: username,
-                handle: userTgHandle,
-                coinsRequested: currentCoinReward,
-                price: finalPrice,
-                method: selectedPaymentType,
-                time: new Date().toLocaleTimeString()
-            };
-
-            database.ref('pending_payments/' + logId).set(paymentLogData);
-
-            const chatLink = userTgHandle ? `https://t.me/${userTgHandle}` : `tg://user?id=${userId.replace('tg_','')}`;
-            const msg = `🔔 *New Payment Filed!*\n\n👤 *User:* ${username}\n📦 *Order:* ${currentCoinReward.toLocaleString()} Store Coins\n💰 *Price:* ${finalPrice}\n💳 *Gateway:* ${selectedPaymentType.toUpperCase()}\n\n💬 [Click here to Message Player](${chatLink})`;
-
-            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg, parse_mode: "Markdown" })
-            }).finally(() => {
-                confirmBtn.textContent = "Awaiting Verification...";
-                showToast("Request sent to Admin desk!");
-                setTimeout(() => { closeModal('detailsModal'); }, 2000);
-            });
-        });
-
-        function listenForAdminLogs() {
-            const container = document.getElementById('adminQueueContainer');
-            database.ref('pending_payments').on('value', (snapshot) => {
-                container.innerHTML = "";
-                const logs = snapshot.val();
-                if (!logs) {
-                    container.innerHTML = `<p style="font-size:13px; color:gray; text-align:center; margin-top:20px;">No pending payment logs found.</p>`;
-                    return;
+        // AUTOMATED HOOK: Pay and claim immediately
+        function payWithFlutterwave(coinReward, priceNgn, packageName) {
+            FlutterwaveCheckout({
+                public_key: FLUTTERWAVE_PUBLIC_KEY,
+                tx_ref: "BC-" + userId + "-" + Date.now(),
+                amount: priceNgn,
+                currency: "NGN",
+                payment_options: "card, banktransfer, ussd",
+                customer: {
+                    email: userTgHandle ? `${userTgHandle}@telegram.com` : `${userId}@biggercoin.com`,
+                    name: username,
+                },
+                customizations: {
+                    title: "Bigger Coin Store",
+                    description: `Purchase ${packageName}`,
+                    logo: "https://checkout.flutterwave.com/v3/images/flutterwave-logo.svg",
+                },
+                callback: function (data) {
+                    if (data.status === "successful" || data.charge_response_code === "00") {
+                        liveShopBalance += coinReward;
+                        localStorage.setItem('bcoin_backup_shop', liveShopBalance);
+                        document.getElementById('shopBalance').textContent = liveShopBalance.toLocaleString();
+                        
+                        database.ref('tg_game_users/' + userId + '/shopBalance').set(liveShopBalance);
+                        showToast("🎉 Payment Successful! Gems Credited.");
+                    } else {
+                        alert("Payment verification failed. Please try again.");
+                    }
+                },
+                onclose: function() {
+                    console.log("Payment checkout modal closed.");
                 }
-                Object.keys(logs).forEach(key => {
-                    const item = logs[key];
-                    const card = document.createElement('div');
-                    card.className = "card";
-                    card.style.flexDirection = "column";
-                    card.style.alignItems = "flex-start";
-                    card.style.gap = "8px";
-                    card.innerHTML = `
-                        <div style="width:100%;">
-                            <h4 style="margin:0; color:var(--primary); font-size:14px;">${item.username} (${item.price})</h4>
-                            <p style="margin:2px 0; font-size:11px; color:#aaa;">Wants: ${item.coinsRequested.toLocaleString()} Store Coins via ${item.method.toUpperCase()}</p>
-                        </div>
-                        <div style="display:flex; gap:10px; width:100%; margin-top:5px;">
-                            <button class="action-btn" style="background:#28a745; color:white; flex:1;" onclick="approvePayment('${item.logId}', '${item.userId}', ${item.coinsRequested})">Approve & Credit Store</button>
-                            <button class="action-btn" style="background:#dc3545; color:white; padding:4px 10px;" onclick="rejectPayment('${item.logId}')">X</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
             });
         }
 
-        function approvePayment(logId, targetUserId, coinReward) {
-            database.ref('tg_game_users/' + targetUserId + '/shopBalance').transaction((current) => {
-                return (current || 0) + coinReward;
-            }).then(() => {
-                database.ref('pending_payments/' + logId).remove();
-                showToast("Store Wallet Credited!");
-            });
-        }
-
-        function rejectPayment(logId) {
-            database.ref('pending_payments/' + logId).remove().then(() => {
-                showToast("Log Cleared.");
-            });
-        }
-
+        // TASK HANDLER WITH AUTOMATIC IMMEDIATE LOCAL+CLOUD BALANCE CREDIT
         function handleTask(platformId, URL, rewardAmt) {
             const btn = platformId === 'tg' ? document.getElementById('taskTgBtn') : document.getElementById('taskYtBtn');
+            const taskCacheKey = `task_done_${platformId}_${userId}`;
+
+            if (localStorage.getItem(taskCacheKey)) {
+                showToast("Task already claimed!");
+                btn.textContent = "Claimed ✓";
+                btn.style.backgroundColor = "#28a745";
+                return;
+            }
+
             if (btn.textContent === "Join" || btn.textContent === "Subscribe") {
                 tg.openLink(URL);
                 btn.textContent = "Verify";
@@ -754,12 +539,22 @@
             } else if (btn.textContent === "Verify") {
                 btn.textContent = "Checking...";
                 btn.disabled = true;
+                
                 setTimeout(() => {
-                    database.ref('tg_game_users/' + userId + '/tapBalance').transaction((curr) => (curr || 0) + rewardAmt);
+                    // Force the addition right here into local tracking variables
+                    liveTapBalance += rewardAmt;
+                    localStorage.setItem('bcoin_backup_tap', liveTapBalance);
+                    document.getElementById('tapBalance').textContent = liveTapBalance.toLocaleString();
+
+                    // Push directly to cloud node synchronously
+                    database.ref('tg_game_users/' + userId + '/tapBalance').set(liveTapBalance);
+                    localStorage.setItem(taskCacheKey, "true");
+
                     btn.textContent = "Claimed ✓";
                     btn.style.backgroundColor = "#28a745";
+                    btn.disabled = false;
                     showToast(`+${rewardAmt.toLocaleString()} Tapped Coins Claimed!`);
-                }, 3000);
+                }, 2000);
             }
         }
 
