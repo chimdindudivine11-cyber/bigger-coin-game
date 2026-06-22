@@ -357,7 +357,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ⚠️ REMEMBER TO REPLACE THESE WITH YOUR BOT TOKENS
+        // ⚠️ EDIT THIS LINE WITH YOUR BOT USERNAME IF NEEDED
         const BOT_USERNAME = "YOUR_ACTUAL_BOT_USERNAME_HERE"; 
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
 
@@ -373,7 +373,7 @@
         var username = "Player";
         var userTgHandle = "";
 
-        // Core local persistent cache layout
+        // Local tracking variables to prevent zero balance drops
         let liveTapBalance = parseInt(localStorage.getItem('bcoin_backup_tap')) || 0;
         let liveShopBalance = parseInt(localStorage.getItem('bcoin_backup_shop')) || 0;
         let multitapLvl = parseInt(localStorage.getItem('bcoin_backup_level')) || 1;
@@ -407,7 +407,6 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
-            // Render local balances instantly so they never see a 0 reset drop
             tapDisplay.textContent = liveTapBalance.toLocaleString();
             shopDisplay.textContent = liveShopBalance.toLocaleString();
             mLevelDisp.textContent = multitapLvl;
@@ -485,7 +484,7 @@
             });
         }
 
-        // AUTOMATED HOOK: Pay and claim immediately
+        // FULL FIXED FLUTTERWAVE CONTROLLER - FORCES CARD, DIRECT BANK TRANSFERS, AND USSD OPTIONS
         function payWithFlutterwave(coinReward, priceNgn, packageName) {
             FlutterwaveCheckout({
                 public_key: FLUTTERWAVE_PUBLIC_KEY,
@@ -520,7 +519,7 @@
             });
         }
 
-        // TASK HANDLER WITH AUTOMATIC IMMEDIATE LOCAL+CLOUD BALANCE CREDIT
+        // IMMEDIATE LOCAL + CLOUD TASK SYNC HANDLER
         function handleTask(platformId, URL, rewardAmt) {
             const btn = platformId === 'tg' ? document.getElementById('taskTgBtn') : document.getElementById('taskYtBtn');
             const taskCacheKey = `task_done_${platformId}_${userId}`;
@@ -541,12 +540,10 @@
                 btn.disabled = true;
                 
                 setTimeout(() => {
-                    // Force the addition right here into local tracking variables
                     liveTapBalance += rewardAmt;
                     localStorage.setItem('bcoin_backup_tap', liveTapBalance);
                     document.getElementById('tapBalance').textContent = liveTapBalance.toLocaleString();
 
-                    // Push directly to cloud node synchronously
                     database.ref('tg_game_users/' + userId + '/tapBalance').set(liveTapBalance);
                     localStorage.setItem(taskCacheKey, "true");
 
