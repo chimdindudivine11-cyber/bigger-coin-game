@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Flutterwave Inline Payment SDK -->
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
         :root {
@@ -96,7 +98,6 @@
             align-items: center;
         }
 
-        /* Coin Tap Elements */
         .coin-wrapper {
             margin: auto 0;
             display: flex;
@@ -130,7 +131,6 @@
             border: 6px solid #fff;
         }
 
-        /* Energy Bar */
         .energy-box {
             width: 100%;
             margin-top: auto;
@@ -160,7 +160,6 @@
             transition: width 0.1s linear;
         }
 
-        /* Cards and Lists */
         .card {
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -216,10 +215,6 @@
             outline: none;
         }
 
-        .crypto-input:focus {
-            border-color: var(--primary);
-        }
-
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -249,10 +244,6 @@
 
         .nav-item.active {
             color: var(--primary);
-        }
-
-        .nav-icon {
-            font-size: 18px;
         }
 
         .toast {
@@ -304,6 +295,7 @@
             </div>
         </div>
 
+        <!-- TAB 1: TAPPER -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -319,6 +311,7 @@
             </div>
         </div>
 
+        <!-- TAB 2: REFERRALS -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -329,6 +322,7 @@
             </button>
         </div>
 
+        <!-- TAB 3: TASKS -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container" style="width:100%;">
@@ -343,6 +337,7 @@
             </div>
         </div>
 
+        <!-- TAB 4: FLUTTERWAVE AUTO STORE -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Gems are credited immediately to your balance upon checkout verification.</p>
@@ -368,12 +363,12 @@
             </div>
         </div>
 
+        <!-- TAB 5: CRYPTO WITHDRAWAL -->
         <div class="screen" id="screen-withdraw">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Blockchain Portal</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:20px; width:100%; text-align: left;">
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:20px; width:100%;">
                 Securely cash out your earnings directly to your decentralized blockchain wallet. 
             </p>
-            
             <div class="card" style="flex-direction: column; align-items: flex-start; gap: 10px; width:100%;">
                 <div style="display:flex; justify-content:space-between; width:100%;">
                     <span style="font-size:13px; color:var(--text-secondary);">Minimum Required:</span>
@@ -384,17 +379,15 @@
                     <span style="font-size:13px; color:#fff; font-weight:bold;"><span id="withdrawEligibleBal">0</span> 🪙</span>
                 </div>
             </div>
-
-            <div id="withdrawalFormContainer" style="width:100%; margin-top:10px;">
-                </div>
+            <div id="withdrawalFormContainer" style="width:100%; margin-top:10px;"></div>
         </div>
         
         <nav class="nav-bar">
-            <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
-            <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
-            <button class="nav-item" onclick="switchTab('tasks')"><div class="nav-icon">📋</div><div>Tasks</div></button>
-            <button class="nav-item" onclick="switchTab('boost')"><div class="nav-icon">🚀</div><div>Store</div></button>
-            <button class="nav-item" onclick="switchTab('withdraw')"><div class="nav-icon">⛓️</div><div>Withdraw</div></button>
+            <button class="nav-item active" onclick="switchTab('tap')"><div style="font-size:18px;">🪙</div><div>Tap</div></button>
+            <button class="nav-item" onclick="switchTab('ref')"><div style="font-size:18px;">👥</div><div>Ref</div></button>
+            <button class="nav-item" onclick="switchTab('tasks')"><div style="font-size:18px;">📋</div><div>Tasks</div></button>
+            <button class="nav-item" onclick="switchTab('boost')"><div style="font-size:18px;">🚀</div><div>Store</div></button>
+            <button class="nav-item" onclick="switchTab('withdraw')"><div style="font-size:18px;">⛓️</div><div>Withdraw</div></button>
         </nav>
     </div>
 
@@ -404,8 +397,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        const BOT_USERNAME = "biggercoin_bot"; 
+        // REPLACE THE LINE BELOW WITH YOUR EXACT FLUTTERWAVE PUBLIC KEY
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
+        const BOT_USERNAME = "biggercoin_bot"; 
 
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -413,16 +407,13 @@
 
         const tg = window.Telegram.WebApp;
         const urlParams = new URLSearchParams(window.location.search);
-        
         let rawRefData = urlParams.get('tgWebAppStartParam') || urlParams.get('ref') || "";
         let referrerId = rawRefData.replace("tgRef_", ""); 
 
-        // System defaults to prevent crash sessions
         var userId = "guest_user";
         var username = "Player";
         var userTgHandle = "";
 
-        // Instantly look into storage so user has zero load lag time
         let liveTapBalance = parseInt(localStorage.getItem('bcoin_backup_tap')) || 0;
         let liveShopBalance = parseInt(localStorage.getItem('bcoin_backup_shop')) || 0;
         let multitapLvl = parseInt(localStorage.getItem('bcoin_backup_level')) || 1;
@@ -431,9 +422,7 @@
 
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
             let directBotLink = `https://t.me/${BOT_USERNAME}/app`;
-            if (referrerId) {
-                directBotLink = `https://t.me/${BOT_USERNAME}?start=tgRef_${referrerId}`;
-            }
+            if (referrerId) { directBotLink = `https://t.me/${BOT_USERNAME}?start=tgRef_${referrerId}`; }
             document.getElementById('manualRedirectBtn').onclick = () => { window.location.href = directBotLink; };
             window.location.href = directBotLink;
         } else {
@@ -450,7 +439,6 @@
 
         function initGameEngine() {
             const userRef = database.ref('tg_game_users/' + userId);
-
             const tapDisplay = document.getElementById('tapBalance');
             const shopDisplay = document.getElementById('shopBalance');
             const energyDisplay = document.getElementById('energy');
@@ -458,14 +446,14 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
-            // Force visual load from localized database blocks immediately
+            // Set up fallback rendering from LocalStorage immediately
             tapDisplay.textContent = liveTapBalance.toLocaleString();
             shopDisplay.textContent = liveShopBalance.toLocaleString();
             mLevelDisp.textContent = multitapLvl;
             mCostDisp.textContent = multitapLvl * 100;
             renderWithdrawalInterface();
 
-            // Permanent cloud listener sync
+            // Permanent Firebase live synchronization loop
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -484,7 +472,7 @@
                 }
                 tapDisplay.textContent = liveTapBalance.toLocaleString();
                 shopDisplay.textContent = liveShopBalance.toLocaleString();
-                renderWithdrawalInterface();
+                renderWithdrawalInterface(); // Kept up to date live
             });
 
             setInterval(() => {
@@ -550,22 +538,20 @@
                     <div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px; line-height:1.6;">
                         <div style="font-size:40px; margin-bottom:10px;">🔒</div>
                         <p>Withdrawal function is currently locked.</p>
-                        <p style="color:var(--warning); font-size:12px;">Tap more or complete tasks to gain another <strong>${missingCoins.toLocaleString()}</strong> coins to unlock blockchain transfers.</p>
+                        <p style="color:var(--warning); font-size:12px;">Earn another <strong>${missingCoins.toLocaleString()}</strong> coins to unlock blockchain transfers.</p>
                         <button class="action-btn" disabled style="width:100%; margin-top:15px;">Locked</button>
                     </div>
                 `;
             } else {
                 container.innerHTML = `
                     <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:6px; text-align:left;">Select Network Protocol:</label>
-                    <select class="crypto-input" id="cryptoNetworkSelect" style="background:#1a1b26;">
+                    <select class="crypto-input" id="cryptoNetworkSelect" style="background:#1a1b26; color: white;">
                         <option value="TON">TON Network (Toncoin)</option>
                         <option value="BSC">BNB Smart Chain (BEP-20)</option>
                         <option value="SOL">Solana Network (SOL)</option>
                     </select>
-                    
                     <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:6px; text-align:left;">Your Crypto Wallet Address:</label>
                     <input type="text" class="crypto-input" id="walletAddressInput" placeholder="Paste your alphanumeric wallet address here...">
-                    
                     <button class="action-btn" id="submitWithdrawBtn" onclick="processBlockchainWithdrawal()" style="width:100%; padding:12px; font-size:14px; background-color:var(--success); color:#fff;">
                         ⚡ Initiate Blockchain Withdrawal
                     </button>
@@ -579,11 +565,6 @@
             
             if (!addressInput || addressInput.length < 10) {
                 alert("Please enter a valid cryptographic wallet address.");
-                return;
-            }
-
-            if (liveTapBalance < 800000) {
-                alert("Insufficient balance.");
                 return;
             }
 
@@ -615,42 +596,45 @@
         }
 
         function payWithFlutterwave(coinReward, priceNgn, packageName) {
-            // High-protection fallback tracking ID initialization
-            let cleanRefId = userId && userId !== "guest_user" ? userId : ("anon_" + Math.floor(Math.random() * 999999));
-            
-            FlutterwaveCheckout({
-                public_key: FLUTTERWAVE_PUBLIC_KEY,
-                tx_ref: "BC-" + cleanRefId + "-" + Date.now(),
-                amount: priceNgn,
-                currency: "NGN",
-                payment_options: "card, banktransfer, ussd",
-                customer: {
-                    email: userTgHandle ? `${userTgHandle}@telegram.com` : `${cleanRefId}@biggercoin.com`,
-                    name: username || "Bigger Coin Player",
-                },
-                customizations: {
-                    title: "Bigger Coin Store",
-                    description: `Purchase ${packageName}`,
-                    logo: "https://checkout.flutterwave.com/v3/images/flutterwave-logo.svg",
-                },
-                callback: function (data) {
-                    if (data.status === "successful" || data.charge_response_code === "00") {
-                        liveShopBalance += coinReward;
-                        localStorage.setItem('bcoin_backup_shop', liveShopBalance);
-                        document.getElementById('shopBalance').textContent = liveShopBalance.toLocaleString();
-                        
-                        if(userId !== "guest_user") {
-                            database.ref('tg_game_users/' + userId + '/shopBalance').set(liveShopBalance);
+            try {
+                let cleanRefId = userId && userId !== "guest_user" ? userId : ("anon_" + Math.floor(Math.random() * 999999));
+                
+                FlutterwaveCheckout({
+                    public_key: FLUTTERWAVE_PUBLIC_KEY,
+                    tx_ref: "BC-" + cleanRefId + "-" + Date.now(),
+                    amount: priceNgn,
+                    currency: "NGN",
+                    payment_options: "card, banktransfer, ussd",
+                    customer: {
+                        email: userTgHandle ? `${userTgHandle}@telegram.com` : `${cleanRefId}@biggercoin.com`,
+                        name: username || "Bigger Coin Player",
+                    },
+                    customizations: {
+                        title: "Bigger Coin Store",
+                        description: `Purchase ${packageName}`,
+                        logo: "https://checkout.flutterwave.com/v3/images/flutterwave-logo.svg",
+                    },
+                    callback: function (data) {
+                        if (data.status === "successful" || data.charge_response_code === "00") {
+                            liveShopBalance += coinReward;
+                            localStorage.setItem('bcoin_backup_shop', liveShopBalance);
+                            document.getElementById('shopBalance').textContent = liveShopBalance.toLocaleString();
+                            
+                            if(userId !== "guest_user") {
+                                database.ref('tg_game_users/' + userId + '/shopBalance').set(liveShopBalance);
+                            }
+                            showToast("🎉 Payment Successful! Gems Credited.");
+                        } else {
+                            alert("Payment verification failed. Please try again.");
                         }
-                        showToast("🎉 Payment Successful! Gems Credited.");
-                    } else {
-                        alert("Payment verification failed. Please try again.");
+                    },
+                    onclose: function() {
+                        console.log("Payment window closed.");
                     }
-                },
-                onclose: function() {
-                    console.log("Payment window minimized or terminated.");
-                }
-            });
+                });
+            } catch (error) {
+                alert("Flutterwave Error: Could not launch checkout window. Please check if your FLUTTERWAVE_PUBLIC_KEY is configured correctly inside the code.");
+            }
         }
 
         function handleTask(platformId, URL, rewardAmt) {
@@ -659,8 +643,6 @@
 
             if (localStorage.getItem(taskCacheKey)) {
                 showToast("Task already claimed!");
-                btn.textContent = "Claimed ✓";
-                btn.style.backgroundColor = "#28a745";
                 return;
             }
 
@@ -676,7 +658,6 @@
                     liveTapBalance += rewardAmt;
                     localStorage.setItem('bcoin_backup_tap', liveTapBalance);
                     document.getElementById('tapBalance').textContent = liveTapBalance.toLocaleString();
-
                     database.ref('tg_game_users/' + userId + '/tapBalance').set(liveTapBalance);
                     localStorage.setItem(taskCacheKey, "true");
 
