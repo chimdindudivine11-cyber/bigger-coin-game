@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Flutterwave Inline Payment SDK -->
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
         :root {
@@ -14,6 +12,8 @@
             --bg: #0b0c10;
             --card-bg: rgba(255, 255, 255, 0.05);
             --text-secondary: #c5c6c7;
+            --success: #28a745;
+            --warning: #ffc107;
         }
 
         body {
@@ -197,6 +197,29 @@
             cursor: pointer;
         }
 
+        .action-btn:disabled {
+            background-color: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .crypto-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .crypto-input:focus {
+            border-color: var(--primary);
+        }
+
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -229,7 +252,7 @@
         }
 
         .nav-icon {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .toast {
@@ -257,7 +280,6 @@
 </head>
 <body>
 
-    <!-- Redirect Launch Shield -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -267,7 +289,6 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
-    <!-- Active Interface Layout Structure -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
@@ -283,7 +304,6 @@
             </div>
         </div>
 
-        <!-- TAB 1: CLICKER GAME -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -299,7 +319,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: REF LINK -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -310,7 +329,6 @@
             </button>
         </div>
 
-        <!-- TAB 3: TASKS SYSTEM -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container" style="width:100%;">
@@ -325,7 +343,6 @@
             </div>
         </div>
 
-        <!-- TAB 4: AUTOMATED FLUTTERWAVE SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Gems are credited immediately to your balance upon checkout verification.</p>
@@ -350,24 +367,43 @@
                 </div>
             </div>
         </div>
+
+        <div class="screen" id="screen-withdraw">
+            <h2 style="margin-top:0; color: var(--primary); width:100%;">Blockchain Portal</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:20px; width:100%; text-align: left;">
+                Securely cash out your earnings directly to your decentralized blockchain wallet. 
+            </p>
+            
+            <div class="card" style="flex-direction: column; align-items: flex-start; gap: 10px; width:100%;">
+                <div style="display:flex; justify-content:space-between; width:100%;">
+                    <span style="font-size:13px; color:var(--text-secondary);">Minimum Required:</span>
+                    <span style="font-size:13px; color:var(--warning); font-weight:bold;">800,000 🪙</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; width:100%;">
+                    <span style="font-size:13px; color:var(--text-secondary);">Your Eligible Balance:</span>
+                    <span style="font-size:13px; color:#fff; font-weight:bold;"><span id="withdrawEligibleBal">0</span> 🪙</span>
+                </div>
+            </div>
+
+            <div id="withdrawalFormContainer" style="width:100%; margin-top:10px;">
+                </div>
+        </div>
         
-        <!-- System Footer Menu Options -->
         <nav class="nav-bar">
             <button class="nav-item active" onclick="switchTab('tap')"><div class="nav-icon">🪙</div><div>Tap</div></button>
             <button class="nav-item" onclick="switchTab('ref')"><div class="nav-icon">👥</div><div>Ref</div></button>
             <button class="nav-item" onclick="switchTab('tasks')"><div class="nav-icon">📋</div><div>Tasks</div></button>
             <button class="nav-item" onclick="switchTab('boost')"><div class="nav-icon">🚀</div><div>Store</div></button>
+            <button class="nav-item" onclick="switchTab('withdraw')"><div class="nav-icon">⛓️</div><div>Withdraw</div></button>
         </nav>
     </div>
 
     <div class="toast" id="toast">Copied!</div>
 
-    <!-- Firebase SDK Operations Modules -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ✅ Your exact username has been saved below
         const BOT_USERNAME = "biggercoin_bot"; 
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
 
@@ -448,6 +484,9 @@
                 }
                 tapDisplay.textContent = liveTapBalance.toLocaleString();
                 shopDisplay.textContent = liveShopBalance.toLocaleString();
+                
+                // Keep the dynamic withdrawal UI interface screen calculated accurately
+                renderWithdrawalInterface();
             });
 
             setInterval(() => {
@@ -496,6 +535,84 @@
                 let cleanId = userId.replace("tg_", "");
                 const referralLink = `https://t.me/${BOT_USERNAME}?start=tgRef_${cleanId}`;
                 navigator.clipboard.writeText(referralLink).then(() => { showToast("Referral Link Copied!"); });
+            });
+        }
+
+        // DYNAMIC WITHDRAWAL RENDERING CONTROL
+        function renderWithdrawalInterface() {
+            document.getElementById('withdrawEligibleBal').textContent = liveTapBalance.toLocaleString();
+            const container = document.getElementById('withdrawalFormContainer');
+            
+            if (liveTapBalance < 800000) {
+                let missingCoins = 800000 - liveTapBalance;
+                container.innerHTML = `
+                    <div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px; line-height:1.6;">
+                        <div style="font-size:40px; margin-bottom:10px;">🔒</div>
+                        <p>Withdrawal function is currently locked.</p>
+                        <p style="color:var(--warning); font-size:12px;">Tap more or complete tasks to gain another <strong>${missingCoins.toLocaleString()}</strong> coins to unlock blockchain transfers.</p>
+                        <button class="action-btn" disabled style="width:100%; margin-top:15px;">Locked</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:6px; text-align:left;">Select Network Protocol:</label>
+                    <select class="crypto-input" id="cryptoNetworkSelect" style="background:#1a1b26;">
+                        <option value="TON">TON Network (Toncoin)</option>
+                        <option value="BSC">BNB Smart Chain (BEP-20)</option>
+                        <option value="SOL">Solana Network (SOL)</option>
+                    </select>
+                    
+                    <label style="font-size:12px; color:var(--text-secondary); display:block; margin-bottom:6px; text-align:left;">Your Crypto Wallet Address:</label>
+                    <input type="text" class="crypto-input" id="walletAddressInput" placeholder="Paste your alphanumeric wallet address here...">
+                    
+                    <button class="action-btn" id="submitWithdrawBtn" onclick="processBlockchainWithdrawal()" style="width:100%; padding:12px; font-size:14px; background-color:var(--success); color:#fff;">
+                        ⚡ Initiate Blockchain Withdrawal
+                    </button>
+                `;
+            }
+        }
+
+        // SECURE FIREBASE BLOCKCHAIN TRANSACTION LOGGING
+        function processBlockchainWithdrawal() {
+            const addressInput = document.getElementById('walletAddressInput').value.trim();
+            const chosenNetwork = document.getElementById('cryptoNetworkSelect').value;
+            
+            if (!addressInput || addressInput.length < 10) {
+                alert("Please enter a valid cryptographic wallet address.");
+                return;
+            }
+
+            if (liveTapBalance < 800000) {
+                alert("Insufficient balance.");
+                return;
+            }
+
+            const btn = document.getElementById('submitWithdrawBtn');
+            btn.textContent = "Processing Securely...";
+            btn.disabled = true;
+
+            const requestData = {
+                walletAddress: addressInput,
+                blockchainNetwork: chosenNetwork,
+                coinAmount: liveTapBalance,
+                timestamp: Date.now(),
+                status: "pending_validation"
+            };
+
+            // Deduct locally and submit token requests to admin registry log node
+            database.ref('tg_game_users/' + userId + '/withdrawalRequest').set(requestData).then(() => {
+                database.ref('tg_game_users/' + userId + '/tapBalance').set(0).then(() => {
+                    liveTapBalance = 0;
+                    localStorage.setItem('bcoin_backup_tap', 0);
+                    document.getElementById('tapBalance').textContent = "0";
+                    
+                    showToast("🎉 Order placed! Processing validation on-chain.");
+                    renderWithdrawalInterface();
+                });
+            }).catch((err) => {
+                alert("Database logging fault, try again.");
+                btn.textContent = "Initiate Blockchain Withdrawal";
+                btn.disabled = false;
             });
         }
 
