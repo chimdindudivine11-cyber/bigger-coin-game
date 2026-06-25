@@ -16,6 +16,7 @@
             --text-secondary: #c5c6c7;
             --success: #28a745;
             --warning: #ffc107;
+            --info: #007bff;
         }
 
         body {
@@ -337,28 +338,38 @@
             </div>
         </div>
 
-        <!-- TAB 4: FLUTTERWAVE AUTO STORE -->
+        <!-- TAB 4: GLOBAL AUTO STORE -->
         <div class="screen" id="screen-boost">
-            <h2 style="margin-top:0; color: var(--primary); width:100%;">Automated Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Gems are credited immediately to your balance upon checkout verification.</p>
+            <h2 style="margin-top:0; color: var(--primary); width:100%;">Coin Shop</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Accepts domestic &amp; international Credit/Debit Cards or Bank Transfers. Gems deliver instantly.</p>
+            
             <div class="list-container" style="width:100%;">
                 <div class="card">
                     <div class="card-info">
                         <h3>Starter Pack (10,000 💎)</h3>
-                        <p style="color:var(--primary); font-weight:600;">₦3,000</p>
+                        <p style="color:var(--primary); font-weight:600;">₦3,000 / Global Equivalent</p>
                     </div>
                     <button class="action-btn" onclick="payWithFlutterwave(10000, 3000, 'Starter Pack')">Buy Pack</button>
                 </div>
                 <div class="card">
                     <div class="card-info">
                         <h3>Whale Pack (100,000 💎)</h3>
-                        <p style="color:var(--primary); font-weight:600;">₦10,000</p>
+                        <p style="color:var(--primary); font-weight:600;">₦10,000 / Global Equivalent</p>
                     </div>
                     <button class="action-btn" onclick="payWithFlutterwave(100000, 10000, 'Whale Pack')">Buy Pack</button>
                 </div>
-                <div class="card" style="margin-top:15px;">
+                <div class="card">
                     <div class="card-info"><h3>Multi-Tap (Lvl <span id="multitapLvl">1</span>)</h3><p>Cost: <span id="multitapCost">100</span> Tapped Coins</p></div>
                     <button class="action-btn" id="buyMultitap">Upgrade</button>
+                </div>
+
+                <!-- INTEGRATED CUSTOMER SUPPORT BANNER -->
+                <div class="card" style="border: 1px dashed #007bff; background: rgba(0, 123, 255, 0.05); margin-top: 20px;">
+                    <div class="card-info">
+                        <h3 style="color: #007bff;">Need Payment Help?</h3>
+                        <p>Chat directly with support regarding issues</p>
+                    </div>
+                    <button class="action-btn" onclick="openCustomerSupport()" style="background-color: var(--info); color: white;">Contact Support</button>
                 </div>
             </div>
         </div>
@@ -397,7 +408,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // REPLACE THE LINE BELOW WITH YOUR EXACT FLUTTERWAVE PUBLIC KEY
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
         const BOT_USERNAME = "biggercoin_bot"; 
 
@@ -446,14 +456,12 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
-            // Set up fallback rendering from LocalStorage immediately
             tapDisplay.textContent = liveTapBalance.toLocaleString();
             shopDisplay.textContent = liveShopBalance.toLocaleString();
             mLevelDisp.textContent = multitapLvl;
             mCostDisp.textContent = multitapLvl * 100;
             renderWithdrawalInterface();
 
-            // Permanent Firebase live synchronization loop
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -472,7 +480,7 @@
                 }
                 tapDisplay.textContent = liveTapBalance.toLocaleString();
                 shopDisplay.textContent = liveShopBalance.toLocaleString();
-                renderWithdrawalInterface(); // Kept up to date live
+                renderWithdrawalInterface();
             });
 
             setInterval(() => {
@@ -604,7 +612,8 @@
                     tx_ref: "BC-" + cleanRefId + "-" + Date.now(),
                     amount: priceNgn,
                     currency: "NGN",
-                    payment_options: "card, banktransfer, ussd",
+                    // Configured options specifically to capture card, transfers, and international digital portals
+                    payment_options: "card, banktransfer, ussd, barter, account",
                     customer: {
                         email: userTgHandle ? `${userTgHandle}@telegram.com` : `${cleanRefId}@biggercoin.com`,
                         name: username || "Bigger Coin Player",
@@ -633,7 +642,15 @@
                     }
                 });
             } catch (error) {
-                alert("Flutterwave Error: Could not launch checkout window. Please check if your FLUTTERWAVE_PUBLIC_KEY is configured correctly inside the code.");
+                alert("Flutterwave configuration mismatch. Confirm that this specific key is fully updated inside your active dashboard settings.");
+            }
+        }
+
+        function openCustomerSupport() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.openTelegramLink("https://t.me/bigger_coin");
+            } else {
+                window.open("https://t.me/bigger_coin", "_blank");
             }
         }
 
