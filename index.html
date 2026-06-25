@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Flutterwave Inline Payment SDK -->
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
         :root {
@@ -270,6 +272,7 @@
 </head>
 <body>
 
+    <!-- Telegram Gateway Loader -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -279,6 +282,7 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
+    <!-- Active Interface Screen Engine -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
@@ -294,6 +298,7 @@
             </div>
         </div>
 
+        <!-- TAB 1: MAIN TAPPER INTERFACE -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -309,6 +314,7 @@
             </div>
         </div>
 
+        <!-- TAB 2: INVITATION PORTAL -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -319,6 +325,7 @@
             </button>
         </div>
 
+        <!-- TAB 3: TASKS STATION -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container" style="width:100%;">
@@ -333,9 +340,10 @@
             </div>
         </div>
 
+        <!-- TAB 4: COIN SHOP WITH ESCAPE-ROUTED BROWSER ROUTINES -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Secure global checkout supporting cards and transfers globally.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Secure global checkout supporting cards and transfers safely.</p>
             
             <div class="list-container" style="width:100%;">
                 <div class="card">
@@ -357,6 +365,7 @@
                     <button class="action-btn" id="buyMultitap">Upgrade</button>
                 </div>
 
+                <!-- SUPPORT PORTAL ROUTER -->
                 <div class="card" style="border: 1px dashed #007bff; background: rgba(0, 123, 255, 0.04); margin-top: 25px;">
                     <div class="card-info">
                         <h3 style="color: #66fcf1;">Need Payment Help?</h3>
@@ -367,6 +376,7 @@
             </div>
         </div>
 
+        <!-- TAB 5: CRYPTO WITHDRAWAL DASHBOARD -->
         <div class="screen" id="screen-withdraw">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Blockchain Portal</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:20px; width:100%;">
@@ -396,11 +406,12 @@
 
     <div class="toast" id="toast">Copied!</div>
 
+    <!-- Firebase SDK Core Modules Hooks -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Set original Live Public Key
+        // Production Verified Configurations
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
         const BOT_USERNAME = "biggercoin_bot"; 
 
@@ -596,13 +607,13 @@
             });
         }
 
+        // Updated optimized script targeting Telegram native redirection configurations explicitly
         function payWithFlutterwave(coinReward, priceUsd, packageName) {
             try {
                 let cleanRefId = userId && userId !== "guest_user" ? userId : ("anon_" + Math.floor(Math.random() * 999999));
-                // Enhanced robust string tracking arrays to isolate transaction state context entirely
                 let secureTxReference = "BC-" + cleanRefId + "-" + Date.now() + "-" + Math.floor(Math.random() * 100000);
                 
-                FlutterwaveCheckout({
+                let paymentArgs = {
                     public_key: FLUTTERWAVE_PUBLIC_KEY,
                     tx_ref: secureTxReference,
                     amount: priceUsd,
@@ -632,9 +643,17 @@
                         }
                     },
                     onclose: function() {
-                        console.log("Secure payment container dismissed.");
+                        console.log("Secure checkout modal dismissed.");
                     }
-                });
+                };
+
+                // Bypasses WebView constraints entirely by escaping into an external phone browser window handler
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.platform !== "unknown") {
+                    const fallbackLink = `https://checkout.flutterwave.com/v3/hosted/pay?public_key=${encodeURIComponent(paymentArgs.public_key)}&tx_ref=${encodeURIComponent(paymentArgs.tx_ref)}&amount=${encodeURIComponent(paymentArgs.amount)}&currency=USD&customer_email=${encodeURIComponent(paymentArgs.customer.email)}&customer_name=${encodeURIComponent(paymentArgs.customer.name)}&title=${encodeURIComponent(paymentArgs.customizations.title)}&description=${encodeURIComponent(paymentArgs.customizations.description)}`;
+                    window.Telegram.WebApp.openLink(fallbackLink);
+                } else {
+                    FlutterwaveCheckout(paymentArgs);
+                }
             } catch (error) {
                 console.error("Flutterwave Runtime Init Error Context:", error);
                 alert("Initialization error. Check your connection or device settings.");
