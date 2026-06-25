@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigger Coin Game</title>
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Flutterwave Inline Payment SDK -->
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
         :root {
@@ -272,7 +270,6 @@
 </head>
 <body>
 
-    <!-- Telegram Gateway Loader -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -282,7 +279,6 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
-    <!-- Active Interface Screen Engine -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
@@ -298,7 +294,6 @@
             </div>
         </div>
 
-        <!-- TAB 1: MAIN TAPPER INTERFACE -->
         <div class="screen active" id="screen-tap">
             <div class="coin-wrapper">
                 <button class="coin-btn" id="coinBtn">
@@ -314,7 +309,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: INVITATION PORTAL -->
         <div class="screen" id="screen-ref">
             <h2 style="margin-top:0; color: var(--primary);">Invite Friends</h2>
             <p style="text-align:center; font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
@@ -325,7 +319,6 @@
             </button>
         </div>
 
-        <!-- TAB 3: TASKS STATION -->
         <div class="screen" id="screen-tasks">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Earn Station</h2>
             <div class="list-container" style="width:100%;">
@@ -340,10 +333,9 @@
             </div>
         </div>
 
-        <!-- TAB 4: COIN SHOP WITH INTEGRATED USD AND SUPPORT PORTALS -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Secure global checkout supporting all major credit/debit cards worldwide.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Secure global checkout supporting cards and transfers globally.</p>
             
             <div class="list-container" style="width:100%;">
                 <div class="card">
@@ -365,7 +357,6 @@
                     <button class="action-btn" id="buyMultitap">Upgrade</button>
                 </div>
 
-                <!-- INTEGRATED TELEGRAM CUSTOMER SUPPORT ROUTER -->
                 <div class="card" style="border: 1px dashed #007bff; background: rgba(0, 123, 255, 0.04); margin-top: 25px;">
                     <div class="card-info">
                         <h3 style="color: #66fcf1;">Need Payment Help?</h3>
@@ -376,7 +367,6 @@
             </div>
         </div>
 
-        <!-- TAB 5: CRYPTO WITHDRAWAL DASHBOARD -->
         <div class="screen" id="screen-withdraw">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Blockchain Portal</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:20px; width:100%;">
@@ -406,11 +396,11 @@
 
     <div class="toast" id="toast">Copied!</div>
 
-    <!-- Firebase SDK Core Modules Hooks -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // Set original Live Public Key
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
         const BOT_USERNAME = "biggercoin_bot"; 
 
@@ -609,7 +599,7 @@
         function payWithFlutterwave(coinReward, priceUsd, packageName) {
             try {
                 let cleanRefId = userId && userId !== "guest_user" ? userId : ("anon_" + Math.floor(Math.random() * 999999));
-                // Added enhanced randomized verification strings to completely prevent "Duplicate tx_ref" rejections
+                // Enhanced robust string tracking arrays to isolate transaction state context entirely
                 let secureTxReference = "BC-" + cleanRefId + "-" + Date.now() + "-" + Math.floor(Math.random() * 100000);
                 
                 FlutterwaveCheckout({
@@ -617,7 +607,7 @@
                     tx_ref: secureTxReference,
                     amount: priceUsd,
                     currency: "USD", 
-                    payment_options: "card, banktransfer, ussd, barter, account",
+                    payment_options: "card, banktransfer, ussd, account",
                     customer: {
                         email: userTgHandle ? `${userTgHandle}@telegram.com` : `${cleanRefId}@biggercoin.com`,
                         name: username || "Bigger Coin Player",
@@ -647,7 +637,7 @@
                 });
             } catch (error) {
                 console.error("Flutterwave Runtime Init Error Context:", error);
-                alert("Initialization error. Check browser logs or dashboard settings.");
+                alert("Initialization error. Check your connection or device settings.");
             }
         }
 
