@@ -272,6 +272,7 @@
 </head>
 <body>
 
+    <!-- Loading Launch Shield -->
     <div id="redirect-screen">
         <div style="font-size: 50px; margin-bottom: 20px;">🪙</div>
         <h2 style="color: var(--primary); margin-bottom: 10px;">Launching Bigger Coin...</h2>
@@ -281,6 +282,7 @@
         <button class="action-btn" id="manualRedirectBtn" style="margin-top: 20px; padding: 12px 25px;">Open Telegram</button>
     </div>
 
+    <!-- Active Interface Layout Structure -->
     <div class="game-container" id="appMain" style="display: none;">
         <div class="header">
             <h1>Bigger Coin</h1>
@@ -338,10 +340,10 @@
             </div>
         </div>
 
-        <!-- TAB 4: GLOBAL AUTO STORE -->
+        <!-- TAB 4: FLUTTERWAVE SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Coin Shop</h2>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Accepts domestic &amp; international Credit/Debit Cards or Bank Transfers. Gems deliver instantly.</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Accepts credit/debit cards or bank transfer. Local &amp; international orders credit immediately.</p>
             
             <div class="list-container" style="width:100%;">
                 <div class="card">
@@ -363,18 +365,18 @@
                     <button class="action-btn" id="buyMultitap">Upgrade</button>
                 </div>
 
-                <!-- INTEGRATED CUSTOMER SUPPORT BANNER -->
-                <div class="card" style="border: 1px dashed #007bff; background: rgba(0, 123, 255, 0.05); margin-top: 20px;">
+                <!-- DIRECT SUPPORT INTERACTION LINK -->
+                <div class="card" style="border: 1px dashed #007bff; background: rgba(0, 123, 255, 0.04); margin-top: 25px;">
                     <div class="card-info">
-                        <h3 style="color: #007bff;">Need Payment Help?</h3>
-                        <p>Chat directly with support regarding issues</p>
+                        <h3 style="color: #66fcf1;">Need Payment Help?</h3>
+                        <p>Message customer service directly on Telegram</p>
                     </div>
                     <button class="action-btn" onclick="openCustomerSupport()" style="background-color: var(--info); color: white;">Contact Support</button>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 5: CRYPTO WITHDRAWAL -->
+        <!-- TAB 5: CRYPTO WITHDRAWAL SYSTEM -->
         <div class="screen" id="screen-withdraw">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Blockchain Portal</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:20px; width:100%;">
@@ -462,6 +464,7 @@
             mCostDisp.textContent = multitapLvl * 100;
             renderWithdrawalInterface();
 
+            // Synced real-time listener ensuring data never resets on reload
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -612,7 +615,7 @@
                     tx_ref: "BC-" + cleanRefId + "-" + Date.now(),
                     amount: priceNgn,
                     currency: "NGN",
-                    // Configured options specifically to capture card, transfers, and international digital portals
+                    // Explicit international channels enabled (cards, transfers, barter mobile engine)
                     payment_options: "card, banktransfer, ussd, barter, account",
                     customer: {
                         email: userTgHandle ? `${userTgHandle}@telegram.com` : `${cleanRefId}@biggercoin.com`,
@@ -634,15 +637,15 @@
                             }
                             showToast("🎉 Payment Successful! Gems Credited.");
                         } else {
-                            alert("Payment verification failed. Please try again.");
+                            alert("Payment could not be verified automatically. Contact support if issues persist.");
                         }
                     },
                     onclose: function() {
-                        console.log("Payment window closed.");
+                        console.log("Payment window minimized.");
                     }
                 });
             } catch (error) {
-                alert("Flutterwave configuration mismatch. Confirm that this specific key is fully updated inside your active dashboard settings.");
+                alert("Flutterwave is currently loading secure configurations. Try again in a few moments.");
             }
         }
 
