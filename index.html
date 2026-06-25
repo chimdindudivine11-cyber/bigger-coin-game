@@ -417,10 +417,12 @@
         let rawRefData = urlParams.get('tgWebAppStartParam') || urlParams.get('ref') || "";
         let referrerId = rawRefData.replace("tgRef_", ""); 
 
+        // System defaults to prevent crash sessions
         var userId = "guest_user";
         var username = "Player";
         var userTgHandle = "";
 
+        // Instantly look into storage so user has zero load lag time
         let liveTapBalance = parseInt(localStorage.getItem('bcoin_backup_tap')) || 0;
         let liveShopBalance = parseInt(localStorage.getItem('bcoin_backup_shop')) || 0;
         let multitapLvl = parseInt(localStorage.getItem('bcoin_backup_level')) || 1;
@@ -456,26 +458,24 @@
             const mLevelDisp = document.getElementById('multitapLvl');
             const mCostDisp = document.getElementById('multitapCost');
 
+            // Force visual load from localized database blocks immediately
             tapDisplay.textContent = liveTapBalance.toLocaleString();
             shopDisplay.textContent = liveShopBalance.toLocaleString();
             mLevelDisp.textContent = multitapLvl;
             mCostDisp.textContent = multitapLvl * 100;
+            renderWithdrawalInterface();
 
+            // Permanent cloud listener sync
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    if ((data.tapBalance || 0) >= liveTapBalance) {
-                        liveTapBalance = data.tapBalance || 0;
-                        localStorage.setItem('bcoin_backup_tap', liveTapBalance);
-                    }
-                    if ((data.shopBalance || 0) >= liveShopBalance) {
-                        liveShopBalance = data.shopBalance || 0;
-                        localStorage.setItem('bcoin_backup_shop', liveShopBalance);
-                    }
-                    if ((data.multitapLvl || 1) >= multitapLvl) {
-                        multitapLvl = data.multitapLvl || 1;
-                        localStorage.setItem('bcoin_backup_level', multitapLvl);
-                    }
+                    liveTapBalance = data.tapBalance !== undefined ? data.tapBalance : liveTapBalance;
+                    liveShopBalance = data.shopBalance !== undefined ? data.shopBalance : liveShopBalance;
+                    multitapLvl = data.multitapLvl !== undefined ? data.multitapLvl : multitapLvl;
+                    
+                    localStorage.setItem('bcoin_backup_tap', liveTapBalance);
+                    localStorage.setItem('bcoin_backup_shop', liveShopBalance);
+                    localStorage.setItem('bcoin_backup_level', multitapLvl);
                     
                     mLevelDisp.textContent = multitapLvl;
                     mCostDisp.textContent = multitapLvl * 100;
@@ -484,8 +484,6 @@
                 }
                 tapDisplay.textContent = liveTapBalance.toLocaleString();
                 shopDisplay.textContent = liveShopBalance.toLocaleString();
-                
-                // Keep the dynamic withdrawal UI interface screen calculated accurately
                 renderWithdrawalInterface();
             });
 
@@ -508,6 +506,7 @@
                     
                     localStorage.setItem('bcoin_backup_tap', liveTapBalance);
                     userRef.update({ tapBalance: liveTapBalance });
+                    renderWithdrawalInterface();
                 }
             });
 
@@ -538,10 +537,12 @@
             });
         }
 
-        // DYNAMIC WITHDRAWAL RENDERING CONTROL
         function renderWithdrawalInterface() {
-            document.getElementById('withdrawEligibleBal').textContent = liveTapBalance.toLocaleString();
+            const displayBlock = document.getElementById('withdrawEligibleBal');
+            if(displayBlock) displayBlock.textContent = liveTapBalance.toLocaleString();
+            
             const container = document.getElementById('withdrawalFormContainer');
+            if(!container) return;
             
             if (liveTapBalance < 800000) {
                 let missingCoins = 800000 - liveTapBalance;
@@ -572,7 +573,6 @@
             }
         }
 
-        // SECURE FIREBASE BLOCKCHAIN TRANSACTION LOGGING
         function processBlockchainWithdrawal() {
             const addressInput = document.getElementById('walletAddressInput').value.trim();
             const chosenNetwork = document.getElementById('cryptoNetworkSelect').value;
@@ -599,33 +599,34 @@
                 status: "pending_validation"
             };
 
-            // Deduct locally and submit token requests to admin registry log node
             database.ref('tg_game_users/' + userId + '/withdrawalRequest').set(requestData).then(() => {
                 database.ref('tg_game_users/' + userId + '/tapBalance').set(0).then(() => {
                     liveTapBalance = 0;
                     localStorage.setItem('bcoin_backup_tap', 0);
                     document.getElementById('tapBalance').textContent = "0";
-                    
                     showToast("🎉 Order placed! Processing validation on-chain.");
                     renderWithdrawalInterface();
                 });
             }).catch((err) => {
-                alert("Database logging fault, try again.");
+                alert("Database communication issue. Try again.");
                 btn.textContent = "Initiate Blockchain Withdrawal";
                 btn.disabled = false;
             });
         }
 
         function payWithFlutterwave(coinReward, priceNgn, packageName) {
+            // High-protection fallback tracking ID initialization
+            let cleanRefId = userId && userId !== "guest_user" ? userId : ("anon_" + Math.floor(Math.random() * 999999));
+            
             FlutterwaveCheckout({
                 public_key: FLUTTERWAVE_PUBLIC_KEY,
-                tx_ref: "BC-" + userId + "-" + Date.now(),
+                tx_ref: "BC-" + cleanRefId + "-" + Date.now(),
                 amount: priceNgn,
                 currency: "NGN",
                 payment_options: "card, banktransfer, ussd",
                 customer: {
-                    email: userTgHandle ? `${userTgHandle}@telegram.com` : `${userId}@biggercoin.com`,
-                    name: username,
+                    email: userTgHandle ? `${userTgHandle}@telegram.com` : `${cleanRefId}@biggercoin.com`,
+                    name: username || "Bigger Coin Player",
                 },
                 customizations: {
                     title: "Bigger Coin Store",
@@ -638,14 +639,16 @@
                         localStorage.setItem('bcoin_backup_shop', liveShopBalance);
                         document.getElementById('shopBalance').textContent = liveShopBalance.toLocaleString();
                         
-                        database.ref('tg_game_users/' + userId + '/shopBalance').set(liveShopBalance);
+                        if(userId !== "guest_user") {
+                            database.ref('tg_game_users/' + userId + '/shopBalance').set(liveShopBalance);
+                        }
                         showToast("🎉 Payment Successful! Gems Credited.");
                     } else {
                         alert("Payment verification failed. Please try again.");
                     }
                 },
                 onclose: function() {
-                    console.log("Payment checkout modal closed.");
+                    console.log("Payment window minimized or terminated.");
                 }
             });
         }
@@ -681,6 +684,7 @@
                     btn.style.backgroundColor = "#28a745";
                     btn.disabled = false;
                     showToast(`+${rewardAmt.toLocaleString()} Tapped Coins Claimed!`);
+                    renderWithdrawalInterface();
                 }, 2000);
             }
         }
