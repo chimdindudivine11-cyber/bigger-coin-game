@@ -340,7 +340,7 @@
             </div>
         </div>
 
-        <!-- TAB 4: COIN SHOP WITH ESCAPE-ROUTED BROWSER ROUTINES -->
+        <!-- TAB 4: COIN SHOP -->
         <div class="screen" id="screen-boost">
             <h2 style="margin-top:0; color: var(--primary); width:100%;">Coin Shop</h2>
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom:15px; width:100%;">Secure global checkout supporting cards and transfers safely.</p>
@@ -413,7 +413,7 @@
     <script>
         // Production Verified Configurations
         const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-98ecd6d16eded08b7549006d8dd22ebf-X"; 
-        const BOT_USERNAME = "biggercoin_bot"; 
+        const BOT_USERNAME = "biggercoin_bot";
 
         const firebaseConfig = { databaseURL: "https://bigger-coin-game-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -433,6 +433,18 @@
         let multitapLvl = parseInt(localStorage.getItem('bcoin_backup_level')) || 1;
         let currentEnergy = 500;
         let maxEnergy = 500;
+
+        // Check if transaction query params exist (coming back from successful redirect payment)
+        if (urlParams.get('status') === 'successful' && urlParams.get('tx_ref')) {
+            let txRef = urlParams.get('tx_ref');
+            if (!localStorage.getItem('processed_' + txRef)) {
+                localStorage.setItem('processed_' + txRef, 'true');
+                let creditedAmount = txRef.includes('Starter') ? 10000 : 100000;
+                liveShopBalance += creditedAmount;
+                localStorage.setItem('bcoin_backup_shop', liveShopBalance);
+                alert("🎉 Payment Successful! Store Gems Credited.");
+            }
+        }
 
         if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
             let directBotLink = `https://t.me/${BOT_USERNAME}/app`;
@@ -607,18 +619,23 @@
             });
         }
 
-        // Updated optimized script targeting Telegram native redirection configurations explicitly
+        // Native redirect routine to let the script handle responsive checkout transitions automatically
         function payWithFlutterwave(coinReward, priceUsd, packageName) {
             try {
                 let cleanRefId = userId && userId !== "guest_user" ? userId : ("anon_" + Math.floor(Math.random() * 999999));
-                let secureTxReference = "BC-" + cleanRefId + "-" + Date.now() + "-" + Math.floor(Math.random() * 100000);
+                // Pack info embedded in reference key so we can easily parse it on return
+                let secureTxReference = "BC-" + packageName.replace(" ", "") + "-" + cleanRefId + "-" + Date.now();
                 
+                // Get current web app URL to act as return page route
+                let returnUrl = window.location.href.split('?')[0];
+
                 let paymentArgs = {
                     public_key: FLUTTERWAVE_PUBLIC_KEY,
                     tx_ref: secureTxReference,
                     amount: priceUsd,
                     currency: "USD", 
                     payment_options: "card, banktransfer, ussd, account",
+                    redirect_url: returnUrl, // Forces native redirection workflow safely on mobile/Telegram devices
                     customer: {
                         email: userTgHandle ? `${userTgHandle}@telegram.com` : `${cleanRefId}@biggercoin.com`,
                         name: username || "Bigger Coin Player",
@@ -627,33 +644,13 @@
                         title: "Bigger Coin Store",
                         description: `Purchase ${packageName}`,
                         logo: "https://checkout.flutterwave.com/v3/images/flutterwave-logo.svg",
-                    },
-                    callback: function (data) {
-                        if (data.status === "successful" || data.charge_response_code === "00") {
-                            liveShopBalance += coinReward;
-                            localStorage.setItem('bcoin_backup_shop', liveShopBalance);
-                            document.getElementById('shopBalance').textContent = liveShopBalance.toLocaleString();
-                            
-                            if(userId !== "guest_user") {
-                                database.ref('tg_game_users/' + userId + '/shopBalance').set(liveShopBalance);
-                            }
-                            showToast("🎉 Payment Successful! Gems Credited.");
-                        } else {
-                            alert("Payment verification missed. Please reach out to customer assistance.");
-                        }
-                    },
-                    onclose: function() {
-                        console.log("Secure checkout modal dismissed.");
                     }
                 };
 
-                // Bypasses WebView constraints entirely by escaping into an external phone browser window handler
-                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.platform !== "unknown") {
-                    const fallbackLink = `https://checkout.flutterwave.com/v3/hosted/pay?public_key=${encodeURIComponent(paymentArgs.public_key)}&tx_ref=${encodeURIComponent(paymentArgs.tx_ref)}&amount=${encodeURIComponent(paymentArgs.amount)}&currency=USD&customer_email=${encodeURIComponent(paymentArgs.customer.email)}&customer_name=${encodeURIComponent(paymentArgs.customer.name)}&title=${encodeURIComponent(paymentArgs.customizations.title)}&description=${encodeURIComponent(paymentArgs.customizations.description)}`;
-                    window.Telegram.WebApp.openLink(fallbackLink);
-                } else {
-                    FlutterwaveCheckout(paymentArgs);
-                }
+                // Trigger standard initialization. Since redirect_url is present, 
+                // Flutterwave completely manages mobile browser redirections perfectly.
+                FlutterwaveCheckout(paymentArgs);
+
             } catch (error) {
                 console.error("Flutterwave Runtime Init Error Context:", error);
                 alert("Initialization error. Check your connection or device settings.");
